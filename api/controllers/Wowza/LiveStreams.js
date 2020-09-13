@@ -34,37 +34,38 @@ var apiKey = process.env.WOWZA_API_KEY;
  * @public
  */
 exports.create = (req, res) => {
-	var timestamp = Math.round(new Date().getTime()/1000);
-	var hmacData = (timestamp+':'+path+':'+apiKey);
-	var signature = crypto.createHmac('sha256',wscApiKey).update(hmacData).digest('hex');
-	const options = {
-		hostname: host,
-		path: path,
-		method: 'POST',
-		headers: {
-			'wsc-access-key': accessKey,
-    		'wsc-timestamp': timestamp,
-    		'wsc-signature': signature,
-    		'Content-Type': 'application/json'
-		}
-	};
-	const req = https.request(options, function(res) {
-  		var body = '';
-  		res.on('data', function(data) {
-    		body += data;
-  		});
-  		res.on('end', function() {
-    		console.log(JSON.parse(body));
-  		});
-	}).on('error', function(e) {
-  		console.log(e.message);
-	});
-	req.write(JSON.stringify({
-  		"live_stream": {
-    		"name": "My New Live Stream"
-  		}
-	}));
-	req.end();
+	res.send('Creating Live Stream.');
+	// var timestamp = Math.round(new Date().getTime()/1000);
+	// var hmacData = (timestamp+':'+path+':'+apiKey);
+	// var signature = crypto.createHmac('sha256',wscApiKey).update(hmacData).digest('hex');
+	// const options = {
+	// 	hostname: host,
+	// 	path: path,
+	// 	method: 'POST',
+	// 	headers: {
+	// 		'wsc-access-key': accessKey,
+ //    		'wsc-timestamp': timestamp,
+ //    		'wsc-signature': signature,
+ //    		'Content-Type': 'application/json'
+	// 	}
+	// };
+	// const req = https.request(options, function(res) {
+ //  		var body = '';
+ //  		res.on('data', function(data) {
+ //    		body += data;
+ //  		});
+ //  		res.on('end', function() {
+ //    		console.log(JSON.parse(body));
+ //  		});
+	// }).on('error', function(e) {
+ //  		console.log(e.message);
+	// });
+	// req.write(JSON.stringify({
+ //  		"live_stream": {
+ //    		"name": "My New Live Stream"
+ //  		}
+	// }));
+	// req.end();
 };
 
 /**
@@ -101,7 +102,7 @@ exports.create = (req, res) => {
  * @public
  */
 exports.fetchAll = (req, res) => {
-	console.log('Fetching All Live Streams.');
+	res.send('Fetching All Live Streams.');
 };
 
 /**
@@ -280,7 +281,7 @@ exports.fetchAll = (req, res) => {
  * @public
  */
 exports.fetchById = (req, res) => {
-	console.log('Fetching A Live Stream.');
+	res.send('Fetching A Live Stream.');
 }
 
 /**
@@ -333,7 +334,7 @@ exports.fetchById = (req, res) => {
  * @public
 */
 exports.update = (req, res) => {
-	console.log('Updating Live Stream.');
+	res.send('Updating Live Stream.');
 };
 
 /**
@@ -349,7 +350,7 @@ exports.update = (req, res) => {
  * @public
  */
 exports.delete = (req, res) => {
-	console.log('Deleting Live Stream');
+	res.send('Deleting Live Stream');
 };
 
 /**
@@ -370,7 +371,7 @@ exports.delete = (req, res) => {
  * @public
  */
 exports.start = (req, res) => {
-	console.log('Starting Live Stream.');
+	res.send('Starting Live Stream.');
 };
 
 /**
@@ -391,7 +392,7 @@ exports.start = (req, res) => {
  * @public
  */
 exports.stop = (req, res) => {
-	console.log('Stopping Live Stream.');
+	res.send('Stopping Live Stream.');
 };
 
 /**
@@ -412,7 +413,7 @@ exports.stop = (req, res) => {
  * @public
  */
 exports.reset = (req, res) => {
-	console.log('Resetting Live Stream.');
+	res.send('Resetting Live Stream.');
 }
 
 /**
@@ -428,7 +429,7 @@ exports.reset = (req, res) => {
  * @public
  */
 exports.regenerate = (req, res) => {
-	console.log('Regenrating Live Stream');
+	res.send('Regenrating Live Stream');
 };
 
 /**
@@ -449,7 +450,7 @@ exports.regenerate = (req, res) => {
  * @public
  */
 exports.fetchThumbnail = (req, res) => {
-	console.log('Fetching Thumbnail of Live Stream.');
+	res.send('Fetching Thumbnail of Live Stream.');
 };
 
 /**
@@ -474,7 +475,7 @@ exports.fetchThumbnail = (req, res) => {
  * @public
  */
 exports.fetchState = (req, res) => {
-	console.log('Checking Live Stream State.');
+	res.send('Checking Live Stream State.');
 };
 
 /**
@@ -510,5 +511,5 @@ exports.fetchState = (req, res) => {
  * @public
  */
 exports.fetchStats = (req, res) => {
-	console.log('Fetching Active Live Stream Metrics.');
+	res.send('Fetching Active Live Stream Metrics.');
 };
