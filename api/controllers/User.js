@@ -1,10 +1,17 @@
 'use strict';
 
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
-
+/**
+ * Module dependencies.
+ * @private
+ */
 var User = require('../models/User.js');
+var createError = require('http-errors');
+var utils = require('../Utils');
 
+/**
+ * Module functions.
+ * @public
+ */
 exports.getAll = (req, res) => {
 	User.getAll( (error, data) => {
 		if (error)
@@ -58,17 +65,16 @@ exports.login = (req, res) => {
 
 	const loginCredentials = new LoginModel(req.body);
 
-	if (!loginCredentials) {
-		res.status(400).send({
-			error: 'Invalid User'
-		});
+	if (typeof loginCredentials !== 'object' || !loginCredentials.input || !loginCredentials.password) {
+		throw new TypeError('Invalid login credentials entered');
 		return;
 	}
 
 	// User input should either be a valid email or valid username
-	if (!validUsername(loginCredentials.input) && !validEmail(loginCredentials.input)) {
+	if (!utils.validUsername(loginCredentials.input) && !utils.validEmail(loginCredentials.input)) {
 		res.status(400).send({
-			error: 'Invalid credentials entered.'
+			status: 400,
+			message: 'Invalid credentials entered.'
 		});
 		return;
 	}
@@ -76,30 +82,34 @@ exports.login = (req, res) => {
 	User.getByUsernameOrEmail(loginCredentials.input, (error, data) => {
 		if (error) {
 			res.status(500).send({
-				error: error.sqlMessage
+				status: 500,
+				message: error.sqlMessage
 			});
 			return
 		}
 		
 		if (data.length === 0) {
 			res.status(400).send({
-				error: 'User was not found.'
+				status: 400,
+				message: 'User was not found.'
 			});
 			return;
 		}
-
-		let user = data[0];
-		let userHashedPassword = user.password;
-		if (!matching(loginCredentials.password, userHashedPassword)) {
+		
+		var user = data[0];
+		var userHashedPassword = user.password;
+		if (!utils.matching(loginCredentials.password, userHashedPassword)) {
 			res.status(401).send({
-				error: 'Authentication failed.'
+				status: 401,
+				message: 'Login credentials do not match.'
 			});
 			return;
 		}
-
-		let lastLogin = new Date();
+		
+		var lastLogin = new Date();
 		user.lastLogin = lastLogin;
 		res.status(200).send({
+			status: 200,
 			user: user,
 			message: 'Login success.'
 		});
@@ -115,46 +125,52 @@ exports.create = (req, res) => {
 	// Validate user
 	if (!newUser) {
 		res.status(400).send({
-			error: 'Invalid User'
+			status: 400,
+			message: 'Invalid user.'
 		});
 		return;
 	}
 
-	if (!validUsername(newUser.username)) {
+	if (!utils.validUsername(newUser.username)) {
 		res.status(400).send({
-			error: 'Valid username is required.'
+			status: 400,
+			message: 'Valid username is required.'
 		});
 		return;
 	}
 
 	if (!newUser.firstName || newUser.firstName.length <= 1 || !newUser.lastName || newUser.lastName.length <= 1) {
 		res.status(400).send({
-			error: 'Valid first and last names are required.'
+			status: 400,
+			message: 'Valid first and last names are required.'
 		});
 		return;
 	}
 
-	if (!validEmail(newUser.email)) {
+	if (!utils.validEmail(newUser.email)) {
 		res.status(400).send({
-			error: 'Valid email is required.'
+			status: 400,
+			message: 'Valid email is required.'
 		});
 		return;
 	}
 
-	if (!validPassword(newUser.password)) {
+	if (!utils.validPassword(newUser.password)) {
 		res.status(400).send({
-			error: 'Password must be 6 characters minimum and contain 1 lowercase, 1 uppercase and 1 number'
+			status: 400,
+			message: 'Password must be 6 characters minimum and contain 1 lowercase, 1 uppercase and 1 number.'
 		});
 		return;
 	}
 
 	// Hash Password
-	newUser.password = encrypted(newUser.password);
+	newUser.password = utils.encrypted(newUser.password);
 
 	User.create(newUser, (error, data) => {
 		if (error) {
 			res.status(500).send({
-				error: error.sqlMessage
+				status: 500,
+				message: error.sqlMessage
 			});
 			return;
 		}
@@ -165,13 +181,14 @@ exports.create = (req, res) => {
 };
 
 exports.updatePreferredName = (req, res) => {
-	const id = req.params.id;
-	const preferredName = decodeURI(req.params.name);
+	var id = req.params.id;
+	var preferredName = decodeURI(req.params.name);
 	console.log(req.params.name, preferredName);
 	User.updatePreferredName(id, preferredName, (error, data) => {
 		if (error) {
 			res.status(500).send({
-				error: error.sqlMessage
+				status: 500,
+				message: error.sqlMessage
 			});
 			return;
 		}
@@ -181,44 +198,18 @@ exports.updatePreferredName = (req, res) => {
 	});
 };
 
-// MARK: - Utils
-function matching(password, hash) {
-	return bcrypt.compareSync(password, hash);
-}
-
-function encrypted(password) {
-	const salt = bcrypt.genSaltSync(saltRounds);
-	return bcrypt.hashSync(password, salt);
-}
-
-function validUsername(username) {
-	return validString(username,
-		"^" +
-		"(?=.*[a-zA-Z\_])" + // only letters and dashes allowed
-		"(?=.{2,})" // 2 characters or longer
-	);
-}
-
-function validPassword(password) {
-	return validString(password, 
-		"^" +
-		"(?=.*[a-z])" + // 1 lowercase letter
-		"(?=.*[A-Z])" + // 1 uppercase letter
-		"(?=.*[0-9])" + // 1 numeric
-		// "(?=.*[!@#$%^&*])" + // 1 special character from list
-		"(?=.{6,})" // 6 characters or longer
-	);
-}
-
-function validEmail(email) {
-	return validString(email,
-		"^" +
-		"(?=.*[@])" + // all emails contains "." and "@" characters
-		"(?=.{3,})" // email should be at least 3 characters long
-	);
-}
-
-function validString(str, regex) {
-	var regex = new RegExp(regex);
-	return typeof str === "string" & regex.test(str); 
-}
+exports.updateDateOfBirth = (req, res) => {
+	var id = req.params.id;
+	var dob = req.params.dob;
+	User.updateDateOfBirth(id, dob, (error, data) => {
+		if (error) {
+			res.status(500).send({
+				status: 500,
+				message: error.sqlMessage
+			});
+			return;
+		}
+		console.log(`DateOfBirth updated: ${dob}`);
+		res.send(data);
+	});
+};

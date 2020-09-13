@@ -22,4 +22,7 @@ module.exports = (app) => {
 
 	app.route('/api/user/:id/preferred/:name')
 		.put(controller.updatePreferredName);
+		
+	app.route('/api/user/:id/dob/:dob')
+		.put(controller.updateDateOfBirth);
 };
