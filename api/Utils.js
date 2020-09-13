@@ -59,8 +59,8 @@ exports.encrypted = (str) => {
  * @param {string} str
  * @public
  */
-exports.validName = (str) => {
-	return validString(str, nameRegExp);
+exports.isName = (str) => {
+	return isString(str, nameRegExp);
 };
 
 /**
@@ -69,8 +69,8 @@ exports.validName = (str) => {
  * @param {string} str
  * @public
  */
-exports.validUsername = (str) => {
-	return validString(str,usernameRegExp);
+exports.isUsername = (str) => {
+	return isString(str,usernameRegExp);
 };
 
 /**
@@ -79,18 +79,18 @@ exports.validUsername = (str) => {
  * @param {string} str
  * @public
  */
-exports.validPassword = (str) => {
-	return validString(str, passwordRegExp);
+exports.isPassword = (str) => {
+	return isString(str, passwordRegExp);
 };
 
 /**
- * Returns 'true' if string parameters is valid email address
+ * @desc Returns 'true' if string parameters is valid email address
  * 
  * @param {string} str
  * @public
  */
-exports.validEmail = (str) => {
-	return validString(str,emailRegExp);
+exports.isEmail = (str) => {
+	return isString(str,emailRegExp);
 };
 
 /**
@@ -99,9 +99,36 @@ exports.validEmail = (str) => {
  * @param {string} str
  * @public
  */
-function validString(str, exp) {
+function isString(str, exp) {
 	var regExp = new RegExp(exp);
 	return typeof str === "string" & regExp.test(str); 
 };
  
-exports.validString = validString;
+exports.isString = isString;
+
+/**
+ * @title Validate Date String.
+ * 
+ * @desc Checks if string is a valid date.
+ * 
+ * @param {string} str
+ * @returns {bool}
+ * @public
+ */
+ exports.isDateString = (str) => {
+ 	if (Date.parse(str)) {
+ 		return false;
+ 	}
+ 	return false;
+ };
+ 
+ /**
+  * @title Validate Date Object.
+  * 
+  * @param {date} dateObj
+  * @returns {bool}
+  * @public
+  */
+ exports.isDate = (dateObj) => {
+ 	return dateObj instanceof Date && !isNaN(dateObj);
+ };

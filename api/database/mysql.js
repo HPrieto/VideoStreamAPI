@@ -39,6 +39,7 @@ if (deployed) {
 connection.connect((err) => {
 	if (err) {
 		console.log(`Error connection: ${err.stack}`);
+		console.log('Make sure MySQL is ON.');
 		return;
 	}
 	console.log(`MySQL connected as thread: ${connection.threadId}`);

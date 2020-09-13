@@ -22,10 +22,10 @@ var apiKey = process.env.WOWZA_API_KEY;
  */
 
 /**
- * Create A Live Stream.
+ * @title Create A Live Stream.
  * @verb POST
  * 
- * This operations creates a live stream.
+ * @desc This operations creates a live stream.
  * 
  * @requestSchema application/json
  * @public
@@ -65,11 +65,12 @@ exports.create = (req, res) => {
 };
 
 /**
- * Fetch All Live Streams
+ * @title Fetch All Live Streams
  * @verb GET
  * 
- * This operation shows limited details for all of your live streams. 
- * For detailed information, fetch a single live stream.
+ * @desc This operation shows limited details for all of your live streams. 
+ * 		 For detailed information, fetch a single live stream.
+ * 
  * @param {integer} page: 
  * 		Returns a paginated view of results from the HTTP request. 
  *		Specify a positive integer to indicate which page of the results 
@@ -78,13 +79,13 @@ exports.create = (req, res) => {
  * 		For more information and examples, see Get paginated query results with 
  * 		the Wowza Streaming Cloud REST API.
  *
- * @param {integer} perPage (per_page)
+ * @param {integer} perPage (per_page):
  *		For use with the page parameter. Indicates how many records should 
  * 		be included in a page of results. A valid value is any positive integer. 
  *		The default and maximum value is 1000.
  * 
- * @responseSchema application/json
- * @responseModel {object} [live_streams]
+ * @response application/json
+ * @responseSchema {object} [live_streams]
  * live_streams: [{
  * 		{string<date-time>} created_at, => The date and time that the live stream was created.
  *		{string} id,					=> The unique alphanumeric string that identifies the live stream.
@@ -98,12 +99,12 @@ exports.fetchAll = (req, res) => {
 };
 
 /**
- * Fetch A Live Stream.
+ * @title Fetch A Live Stream.
  * @verb GET
  * 
- * This operation shows the details of a specific live stream.
+ * @desc This operation shows the details of a specific live stream.
  * 
- * @param {string} id => The unique alphanumeric string that identifies the live stream.
+ * @param {string} id: The unique alphanumeric string that identifies the live stream.
  * @return {object} live_stream: {
 			"aspect_ratio_height": 1080,
 			"aspect_ratio_width": 1920,
@@ -274,10 +275,10 @@ exports.fetch = (req, res) => {
 }
 
 /**
- * Update A Live Stream
+ * @title Update A Live Stream
  * @verb PATCH
  * 
- * This operation updates a live stream.
+ * @desc This operation updates a live stream.
  * 
  * @param {string} id => The unique alphanumeric string that identifies the live stream.
  * 
@@ -324,10 +325,10 @@ exports.update = (req, res) => {
 };
 
 /**
- * Delete A Live Stream
+ * @title Delete A Live Stream
  * @verb DELETE
  * 
- * This operation deletes a live stream, including all assigned outputs and targets.
+ * @desc This operation deletes a live stream, including all assigned outputs and targets.
  * 
  * @param {string} id
  * @public
@@ -337,10 +338,10 @@ exports.delete = (req, res) => {
 };
 
 /**
- * Start A Live Stream
+ * @title Start A Live Stream
  * @verb PUT
  * 
- * This operation starts a live stream.
+ * @desc This operation starts a live stream.
  *
  * @param {string} id
  * 
@@ -354,22 +355,89 @@ exports.start = (req, res) => {
 	console.log('Starting Live Stream.');
 };
 
+/**
+ * @title Stop A Live Stream
+ * @verb PUT
+ * 
+ * @desc This operation stops a live stream.
+ * 
+ * @param {string} id
+ * 
+ * @response application/json
+ * @responseSchema {object} live_stream: {
+ * 		"state": "stopped" // "started" "stopped" "starting" "stopping" "resetting"
+ * }
+ */
 exports.stop = (req, res) => {
 	console.log('Stopping Live Stream.');
 };
 
+/**
+ * @title Reset A Live Stream.
+ * @verb PUT
+ * 
+ * @desc This operation resets a live stream.
+ * 
+ * @param {string} id
+ * 
+ * @response application/json
+ * @responseSchema {object} live_stream: {
+ * 		"state": "resetting" // "started" "stopped" "starting" "stopping" "resetting"
+ * }
+ */
 exports.reset = (req, res) => {
 	console.log('Resetting Live Stream.');
 }
 
+/**
+ * @title Regenerate the connection code for a live stream.
+ * @verb PUT
+ * 
+ * @desc This operation regenerates the connection code of a live stream.
+ * 
+ * @param {string} id: 
+ * @public
+ */
 exports.regenerate = (req, res) => {
 	console.log('Regenrating Live Stream');
 };
 
+/**
+ * @title Fetch the thumbnail URL of the live stream.
+ * @verb GET
+ * 
+ * @desc This operation shows the thumbnail URL of a started live stream.
+ * 
+ * @param {string} id: The unique alphanumeric string that identifies the live stream.
+ * 
+ * @response application/json
+ * @responseSchema {object} live_stream: {
+ * 		"thumbnail_url": "some_url.com" // The URL to receive the preview thumbnail
+ * }
+ * @public
+ */
 exports.thumbnail = (req, res) => {
 	console.log('Fetching Thumbnail of Live Stream.');
 };
 
+/**
+ * @title Fetch the state of a live stream.
+ * @verb GET
+ * 
+ * @desc This operation shows the current state of a live stream.
+ * 
+ * @param {string} id
+ * 
+ * @response application/json
+ * @responseSchema {object} live_stream: {
+ * 		"ip_address": "123.0.0.1",  // The IP address of the live stream instance.
+ *									// If the state is anything other than "started", 
+ *									// The IP address is 0.0.0.0
+ * 
+ * 		"state": "started"	// Enum: "started" "stopped" "starting" "stopping" "resetting"
+ * }
+ * @public
+ */
 exports.state = (req, res) => {
 	console.log('Checking Live Stream State.');
 };

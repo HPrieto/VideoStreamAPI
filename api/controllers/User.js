@@ -71,7 +71,7 @@ exports.login = (req, res) => {
 	}
 
 	// User input should either be a valid email or valid username
-	if (!utils.validUsername(loginCredentials.input) && !utils.validEmail(loginCredentials.input)) {
+	if (!utils.isUsername(loginCredentials.input) && !utils.isEmail(loginCredentials.input)) {
 		res.status(400).send({
 			status: 400,
 			message: 'Invalid credentials entered.'
@@ -131,7 +131,7 @@ exports.create = (req, res) => {
 		return;
 	}
 
-	if (!utils.validUsername(newUser.username)) {
+	if (!utils.isUsername(newUser.username)) {
 		res.status(400).send({
 			status: 400,
 			message: 'Valid username is required.'
@@ -147,7 +147,7 @@ exports.create = (req, res) => {
 		return;
 	}
 
-	if (!utils.validEmail(newUser.email)) {
+	if (!utils.isEmail(newUser.email)) {
 		res.status(400).send({
 			status: 400,
 			message: 'Valid email is required.'
@@ -155,7 +155,7 @@ exports.create = (req, res) => {
 		return;
 	}
 
-	if (!utils.validPassword(newUser.password)) {
+	if (!utils.isPassword(newUser.password)) {
 		res.status(400).send({
 			status: 400,
 			message: 'Password must be 6 characters minimum and contain 1 lowercase, 1 uppercase and 1 number.'

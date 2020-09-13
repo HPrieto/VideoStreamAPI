@@ -5,6 +5,7 @@
  * @private
  */
 var connection = require('../database/mysql');
+var utils = require('../Utils');
 
 /**
 user table schema:
@@ -54,7 +55,13 @@ var User = function(model) {
  * @public
  */
  
- // return all records in 'user' table
+/**
+ * @title Fetch all users in 'user' table.
+ * @verb GET
+ * 
+ * @desc Fetches all records in user table.
+ * @public
+ */
 User.getAll = (res) => {
 	connection.query(
 		"SELECT * FROM user ORDER BY id",
@@ -67,12 +74,11 @@ User.getAll = (res) => {
 };
 
 /**
- * Return record from 'user' table with matching 'id'
+ * @title Fetch Record in user Table with id
+ * @verb GET
  *
- * @param {int} id
- * @param {function} res
- *
- * @return {function} 
+ * @param {int} id: ID of record in user table.
+ * @param {function} res: Response callback.
  * @public
  */
 User.getById = (id, res) => {
@@ -95,16 +101,19 @@ User.getById = (id, res) => {
 };
 
 /**
- * Returns record from 'user' table with matching 'username'
+ * @title Fetch Record in user Table with username.
+ * @verb GET
+ * 
+ * @desc Fetches record in user table with matching username.
+ * 		 Column 'username' is UNIQUE in user table
  *
  * @param {string} username
  * @param {function} res
- *
  * @public
  */
 User.getByUsername = (username, res) => {
 	
-	if (typeof username !== 'string') {
+	if (!utils.isUsername(username)) {
 		throw new TypeError(`Argument expected instance of string, received instance of ${typeof username}.`);
 	}
 	
@@ -126,7 +135,8 @@ User.getByUsername = (username, res) => {
 };
 
 /**
- * Returns record with matching username or email
+ * Fetch Record in 'user' Table with Matching 'username' or 'email' column value.
+ * @verb GET
  *
  * @param {string} input
  * @param {function} res
@@ -134,7 +144,7 @@ User.getByUsername = (username, res) => {
  */
 User.getByUsernameOrEmail = (input, res) => {
 	
-	if (typeof input !== 'string') {
+	if (!utils.isUsername(input) && !utils.isEmail(input)) {
 		throw new TypeError(`Argument expected instance of string, received instance of ${typeof input}.`);
 	}
 	
@@ -156,7 +166,10 @@ User.getByUsernameOrEmail = (input, res) => {
 };
 
 /**
- * Creates new record in 'user' table
+ * @Title Create New User.
+ * @verb PUT
+ * 
+ * @desc Inserts new record into 'user' table.
  *
  * @param {object} user
  * @param {function} res
@@ -181,7 +194,10 @@ User.create = (user, res) => {
 };
 
 /**
- * Deletes all records in 'user' table
+ * @title Delete All Users.
+ * @verb DELETE
+ * 
+ * @desc Deletes every record in 'user' table.
  *
  * @param {function} res
  * @public
@@ -199,7 +215,8 @@ User.deleteAll = (res) => {
 };
 
 /**
- * Deletes record in 'user' table with matching 'id'
+ * @title Delete User with ID
+ * @verb DELETE
  * 
  * @param {int} id
  * @param {function} res
@@ -224,7 +241,7 @@ User.deleteById = (id, res) => {
 };
 
 /**
- * Updates record in 'user' table with 'id'
+ * @title Update User with ID
  *
  * @param {int} id
  * @param {string} preferredName
@@ -258,10 +275,13 @@ User.updatePreferredName = (id, preferredName, res) => {
 };
 
 /**
- * Updates column 'lastLogin' in 'user' table with matching id
+ * @title Update Last Login DateTime Field for User.
+ * @verb PUT
+ * 
+ * @desc Updates the 'lastLogin' column field for record with 'id' in 'user' table.
  *
  * @param {int} id
- * @param {date} lastLoginDate
+ * @param {string<Date-Time>} lastLoginDate
  * @param {function} res
  * @public
  */
@@ -271,7 +291,7 @@ User.updateLastLogin = (id, lastLoginDate, res) => {
 		throw new TypeError(`Argument expected an instance of integer, received instance of ${typeof id}.`);
 	}
 	
-	if (typeof lastLoginDate !== 'date') {
+	if (!utils.isDate(lastLoginDate)) {
 		throw new TypeError(`Argument expected an instance of date, received instance of ${typeof lastLogin}.`);
 	}
 	
@@ -288,24 +308,26 @@ User.updateLastLogin = (id, lastLoginDate, res) => {
 };
 
 /**
- * Updates column 'dateOfBirth' in 'user' table for record with matching id
+ * @title Update Date Of Birth for User.
+ * @verb PUT
+ * 
+ * @desc Updates 'dateOfBirth' column for record with 'id' in 'user' table.
  *
  * @param {int} id
- * @param {string} dob
+ * @param {Date} dob
  * @param {function} res
  * @public
  */
  User.updateDateOfBirth = (id, dob, res) => {
+ 	var dateOfBirth = new Date(dob);
  	
  	if (isNaN(id)) {
  		throw new TypeError(`Argument expected an instance of integer, received instance of ${typeof id}.`);
  	}
  	
- 	if (Date.parse(dob)) {
+ 	if (!utils.isDate(dateOfBirth)) {
  		throw new TypeError(`Argument is invalid date format.`);
  	}
- 	
- 	var dateOfBirth = new Date(dob);
  	
  	connection.query(
  		"UPDATE user SET dateOfBirth = ? WHERE id = ?",
