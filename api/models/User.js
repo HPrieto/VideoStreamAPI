@@ -176,14 +176,31 @@ User.getByUsernameOrEmail = (input, res) => {
  * @public
  */
 User.create = (user, res) => {
+	var newUser = new User(user);
 	
-	if (typeof user !== 'object') {
+	if (typeof newUser !== 'object') {
 		throw new TypeError(`Argument expected instance of object, received instance of ${typeof user}.`);
+	}
+	
+	if (!utils.isName(newUser.firstName)) {
+		throw new TypeError(`Instance object of User contains invalid First Name.`);
+	}
+	
+	if (!utils.isUsername(newUser.username)) {
+		throw new TypeError(`Instance object of User contains invalid Username.`);
+	}
+	
+	if (!utils.isPassword(newUser.password)) {
+		throw new TypeError(`Instance object of User contains invalid Password.`);
+	}
+	
+	if (!utils.isEmail(newUser.email)) {
+		throw new TypeError(`Instance object of User contains invalid Email.`);
 	}
 	
 	connection.query(
 		"INSERT INTO user SET ?",
-		user,
+		newUser,
 		(error, data) => {
 			if (error)
 				res(error, null);
