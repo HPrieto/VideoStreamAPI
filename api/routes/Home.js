@@ -8,9 +8,9 @@ module.exports = (app) => {
 		res.send('<h1>Hello World!</h1>');
 	});
 	
-	app.route('/gendate')
+	app.route('/generate/date')
 		.get(controller.generateDate);
 	
-	app.route('/gendate/day/:day/month/:month/year/:year')
+	app.route('/generate/date/day/:day/month/:month/year/:year')
 		.get(controller.generateDMY);
 };

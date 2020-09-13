@@ -23,11 +23,14 @@ var apiKey = process.env.WOWZA_API_KEY;
 
 /**
  * @title Create A Live Stream.
- * @verb POST
  * 
  * @desc This operations creates a live stream.
  * 
  * @requestSchema application/json
+ * 
+ * @endpoint /api/live_streams
+ * @verb POST
+ * 
  * @public
  */
 exports.create = (req, res) => {
@@ -66,7 +69,6 @@ exports.create = (req, res) => {
 
 /**
  * @title Fetch All Live Streams
- * @verb GET
  * 
  * @desc This operation shows limited details for all of your live streams. 
  * 		 For detailed information, fetch a single live stream.
@@ -92,6 +94,10 @@ exports.create = (req, res) => {
  *		{string} name,					=> A descriptive name for the live stream. Maximum 200 characters.
  *		{string<date-time>} updated_at	=> The date and time that the live stream was updated.
  * }]
+ * 
+ * @endpoint /api/live_streams
+ * @verb GET
+ * 
  * @public
  */
 exports.fetchAll = (req, res) => {
@@ -100,7 +106,6 @@ exports.fetchAll = (req, res) => {
 
 /**
  * @title Fetch A Live Stream.
- * @verb GET
  * 
  * @desc This operation shows the details of a specific live stream.
  * 
@@ -268,15 +273,18 @@ exports.fetchAll = (req, res) => {
 			"vod_stream": true
   		}
 	}
+ * 
+ * @endpoint /api/live_streams/{id}
+ * @verb GET
+ * 
  * @public
  */
-exports.fetch = (req, res) => {
+exports.fetchById = (req, res) => {
 	console.log('Fetching A Live Stream.');
 }
 
 /**
  * @title Update A Live Stream
- * @verb PATCH
  * 
  * @desc This operation updates a live stream.
  * 
@@ -318,6 +326,10 @@ exports.fetch = (req, res) => {
 			"vod_stream": true
  		}
  	}
+ * 
+ * @endpoint /api/live_streams/{id}
+ * @verb PATCH
+ * 
  * @public
 */
 exports.update = (req, res) => {
@@ -326,11 +338,14 @@ exports.update = (req, res) => {
 
 /**
  * @title Delete A Live Stream
- * @verb DELETE
  * 
  * @desc This operation deletes a live stream, including all assigned outputs and targets.
  * 
  * @param {string} id
+ * 
+ * @endpoint /api/live_streams/{id}/delete
+ * @verb DELETE
+ * 
  * @public
  */
 exports.delete = (req, res) => {
@@ -339,8 +354,7 @@ exports.delete = (req, res) => {
 
 /**
  * @title Start A Live Stream
- * @verb PUT
- * 
+ *
  * @desc This operation starts a live stream.
  *
  * @param {string} id
@@ -349,6 +363,10 @@ exports.delete = (req, res) => {
  * @responseSchema {object} live_stream: {
  * 		"state": "started" // "started" "stopped" "starting" "stopping" "resetting"
  * }
+ * 
+ * @endpoint /api/live_streams/{id}/start
+ * @verb PUT
+ * 
  * @public
  */
 exports.start = (req, res) => {
@@ -357,7 +375,6 @@ exports.start = (req, res) => {
 
 /**
  * @title Stop A Live Stream
- * @verb PUT
  * 
  * @desc This operation stops a live stream.
  * 
@@ -367,6 +384,11 @@ exports.start = (req, res) => {
  * @responseSchema {object} live_stream: {
  * 		"state": "stopped" // "started" "stopped" "starting" "stopping" "resetting"
  * }
+ * 
+ * @endpoint /api/live_streams/{id}/stop
+ * @verb PUT
+ * 
+ * @public
  */
 exports.stop = (req, res) => {
 	console.log('Stopping Live Stream.');
@@ -374,7 +396,6 @@ exports.stop = (req, res) => {
 
 /**
  * @title Reset A Live Stream.
- * @verb PUT
  * 
  * @desc This operation resets a live stream.
  * 
@@ -384,6 +405,11 @@ exports.stop = (req, res) => {
  * @responseSchema {object} live_stream: {
  * 		"state": "resetting" // "started" "stopped" "starting" "stopping" "resetting"
  * }
+ * 
+ * @endpoint /api/live_streams/{id}/reset
+ * @verb PUT
+ * 
+ * @public
  */
 exports.reset = (req, res) => {
 	console.log('Resetting Live Stream.');
@@ -391,11 +417,14 @@ exports.reset = (req, res) => {
 
 /**
  * @title Regenerate the connection code for a live stream.
- * @verb PUT
  * 
  * @desc This operation regenerates the connection code of a live stream.
  * 
  * @param {string} id: 
+ * 
+ * @endpoint /api/live_streams/{id}/regenerate
+ * @verb PUT
+ * 
  * @public
  */
 exports.regenerate = (req, res) => {
@@ -404,8 +433,7 @@ exports.regenerate = (req, res) => {
 
 /**
  * @title Fetch the thumbnail URL of the live stream.
- * @verb GET
- * 
+ *
  * @desc This operation shows the thumbnail URL of a started live stream.
  * 
  * @param {string} id: The unique alphanumeric string that identifies the live stream.
@@ -414,15 +442,18 @@ exports.regenerate = (req, res) => {
  * @responseSchema {object} live_stream: {
  * 		"thumbnail_url": "some_url.com" // The URL to receive the preview thumbnail
  * }
+ * 
+ * @endpoint /api/live_streams/{id}/thumbnail_url
+ * @verb GET
+ * 
  * @public
  */
-exports.thumbnail = (req, res) => {
+exports.fetchThumbnail = (req, res) => {
 	console.log('Fetching Thumbnail of Live Stream.');
 };
 
 /**
  * @title Fetch the state of a live stream.
- * @verb GET
  * 
  * @desc This operation shows the current state of a live stream.
  * 
@@ -436,12 +467,48 @@ exports.thumbnail = (req, res) => {
  * 
  * 		"state": "started"	// Enum: "started" "stopped" "starting" "stopping" "resetting"
  * }
+ * 
+ * @endpoint /api/live_streams/{id}/state
+ * @verb GET
+ * 
  * @public
  */
-exports.state = (req, res) => {
+exports.fetchState = (req, res) => {
 	console.log('Checking Live Stream State.');
 };
 
-exports.metrics = (req, res) => {
+/**
+ * @title Fetch metrics for an active live stream.
+ * 
+ * @desc This operation returns a hash of metrics keys, each of which identifies
+ *       a status, text description, unit and value.
+ * 
+ * @param {string} id: The unique alphanumeric string that identifies the live stream.
+ * 
+ * @response application/json
+ * @responseSchema "live_stream": {
+ * 	"audio_codec": {},
+ * 	"bits_in_rate": {},
+ * 	"bits_out_rate": {},
+ * 	"bytes_in_rate": {},
+ * 	"bytes_out_rate": {},
+ * 	"configured_bytes_out_rate": {},
+ * 	"connected": {},
+ * 	"frame_size": {},
+ * 	"frame_rate": {},
+ * 	"height": {},
+ * 	"keyframe_interval": {},
+ * 	"stream_target_status_OUTPUTIDX_STREAMTARGETIDX": {},
+ * 	"unique_views": {},
+ * 	"video_codec": {},
+ * 	"width": {}
+ * } 
+ * 
+ * @endpoint /api/live_streams/{id}/stats
+ * @verb GET
+ * 
+ * @public
+ */
+exports.fetchStats = (req, res) => {
 	console.log('Fetching Active Live Stream Metrics.');
 };
