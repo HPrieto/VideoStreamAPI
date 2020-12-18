@@ -4,15 +4,15 @@ module.exports = (app) => {
 	var controller = require('../controllers/User');
 
 	app.route('/api/user')
-		.get(controller.getAll)
+		.get(controller.findAll)
 		.delete(controller.deleteAll);
 
 	app.route('/api/user/:id')
-		.get(controller.getById)
+		.get(controller.findById)
 		.delete(controller.deleteById);
 
 	app.route('/api/user/username/:username')
-		.get(controller.getByUsername);
+		.get(controller.findByUsername);
 
 	app.route('/api/user/signup')
 		.post(controller.create);
@@ -22,4 +22,7 @@ module.exports = (app) => {
 
 	app.route('/api/user/:id/preferred/:name')
 		.put(controller.updatePreferredName);
+		
+	app.route('/api/user/:id/updatepassword')
+		.put(controller.updatePasswordForUserWithId);
 };

@@ -1,6 +1,8 @@
 'use strict';
 
 var connection = require('../database/mysql');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 /**
 user table schema:
@@ -41,9 +43,9 @@ var User = function(model) {
 };
 
 /// Controller Methods
-User.getAll = (res) => {
+User.findAll = (res) => {
 	connection.query(
-		"SELECT * FROM user ORDER BY id",
+		"SELECT * FROM users ORDER BY id",
 		(error, data) => {
 			if (error)
 				res(error, null);
@@ -52,9 +54,9 @@ User.getAll = (res) => {
 		});
 };
 
-User.getById = (id, res) => {
+User.findById = (id, res) => {
 	connection.query(
-		"SELECT * FROM user WHERE id = ? ORDER BY id",
+		"SELECT * FROM users WHERE id = ? ORDER BY id",
 		id,
 		(error, data) => {
 			if (error) {
@@ -66,9 +68,9 @@ User.getById = (id, res) => {
 	);
 };
 
-User.getByUsername = (username, res) => {
+User.findByUsername = (username, res) => {
 	connection.query(
-		"SELECT * FROM user WHERE username = ? ORDER BY username",
+		"SELECT * FROM users WHERE username = ? ORDER BY username",
 		username,
 		(error, data) => {
 			if (error) {
@@ -80,9 +82,9 @@ User.getByUsername = (username, res) => {
 	);
 };
 
-User.getByUsernameOrEmail = (input, res) => {
+User.findByUsernameOrEmail = (input, res) => {
 	connection.query(
-		"SELECT * FROM user WHERE username = ? OR email = ? LIMIT 1",
+		"SELECT * FROM users WHERE username = ? OR email = ? LIMIT 1",
 		[input, input],
 		(error, data) => {
 			if (error) {
@@ -96,7 +98,7 @@ User.getByUsernameOrEmail = (input, res) => {
 
 User.create = (user, res) => {
 	connection.query(
-		"INSERT INTO user SET ?",
+		"INSERT INTO users SET ?",
 		user,
 		(error, data) => {
 			if (error)
@@ -109,7 +111,7 @@ User.create = (user, res) => {
 
 User.deleteAll = (res) => {
 	connection.query(
-		"DELETE FROM user WHERE id > 0",
+		"DELETE FROM users WHERE id > 0",
 		(error, data) => {
 			if (error)
 				res(error, null);
@@ -122,7 +124,7 @@ User.deleteAll = (res) => {
 
 User.deleteById = (id, res) => {
 	connection.query(
-		"DELETE FROM user WHERE id = ?",
+		"DELETE FROM users WHERE id = ?",
 		id,
 		(error, data) => {
 			if (error)
@@ -136,7 +138,7 @@ User.deleteById = (id, res) => {
 // MARK: - PUT
 User.updatePreferredName = (id, preferredName, res) => {
 	connection.query(
-		"UPDATE user SET preferredName = ? WHERE id  = ?",
+		"UPDATE users SET preferredName = ? WHERE id  = ?",
 		[preferredName, id],
 		(error, data) => {
 			if (error)
@@ -149,7 +151,7 @@ User.updatePreferredName = (id, preferredName, res) => {
 
 User.updateLastLogin = (id, lastLogin, res) => {
 	connection.query(
-		"UPDATE user SET lastLogin = ? WHERE id = ?",
+		"UPDATE users SET lastLogin = ? WHERE id = ?",
 		[lastLogin, id],
 		(error, data) => {
 			if (error)
@@ -160,6 +162,81 @@ User.updateLastLogin = (id, lastLogin, res) => {
 	);
 }
 
+/**
+ * Updates the password for a given user with id.
+ * @param {int} id
+ * @param {string} oldPassword
+ * @param {string} newPassword
+ * @api public
+ */
+User.updatePasswordForUserWithId = (id, newPassword, res) => {
+	connection.query(
+		"UPDATE users SET password = ? WHERE id = ?",
+		[newPassword, id],
+		(error, data) => {
+			if (error)
+				res(error, null);
+			else
+				res(null, data);
+		});
+}
+
+/**
+ * Module Utils.
+ */
+
+/**
+ * Checks if non-hashed string is equal to hash.
+ * @param {string} str 
+ * @param {string} hash
+ * @param {function} done
+ * @api public
+ */
+User.matching = (str, hash, done) => {
+	done(bcrypt.compareSync(str, hash));
+}
+
+/**
+ * Encrypts a string.
+ * @param {string} str
+ * @api public
+ */
+User.encrypted = (str) => {
+	const salt = bcrypt.genSaltSync(saltRounds);
+	return bcrypt.hashSync(str, salt);
+}
+
+User.validUsername = (username) => {
+	return User.validString(username,
+		"^" +
+		"(?=.*[a-zA-Z\_])" + // only letters and dashes allowed
+		"(?=.{2,})" // 2 characters or longer
+	);
+}
+
+User.validPassword = (password) => {
+	return User.validString(password, 
+		"^" +
+		"(?=.*[a-z])" + // 1 lowercase letter
+		"(?=.*[A-Z])" + // 1 uppercase letter
+		"(?=.*[0-9])" + // 1 numeric
+		// "(?=.*[!@#$%^&*])" + // 1 special character from list
+		"(?=.{6,})" // 6 characters or longer
+	);
+}
+
+User.validEmail = (email) => {
+	return User.validString(email,
+		"^" +
+		"(?=.*[@])" + // all emails contains "." and "@" characters
+		"(?=.{3,})" // email should be at least 3 characters long
+	);
+}
+
+User.validString = (str, regex) => {
+	var regex = new RegExp(regex);
+	return typeof str === "string" & regex.test(str); 
+}
 
 
 module.exports = User;
