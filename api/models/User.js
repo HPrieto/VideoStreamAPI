@@ -37,12 +37,10 @@ var User = function(model) {
 	this.lastName 	 = model.lastName;
 	this.preferredName = model.preferredName;
 	this.phoneNumber = model.phoneNumber;
-	this.email 		 = model.email;
 	this.dateOfBirth = model.dateOfBirth;
 	this.createdDate = model.createdDate;
 };
 
-/// Controller Methods
 User.findAll = (res) => {
 	connection.query(
 		"SELECT * FROM users ORDER BY id",

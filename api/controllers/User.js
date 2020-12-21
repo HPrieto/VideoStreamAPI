@@ -134,7 +134,7 @@ exports.create = (req, res) => {
 	}
 
 	if (!User.validEmail(newUser.email)) {
-		res.status(400).send(message: 'Valid email is required.');
+		res.status(400).send('Valid email is required.');
 		return;
 	}
 
@@ -142,13 +142,17 @@ exports.create = (req, res) => {
 		res.status(400).send('Password must be 6 characters minimum and contain 1 lowercase, 1 uppercase and 1 number');
 		return;
 	}
+	
+	if (typeof newUser.dateOfBirth === "string" && newUser.dateOfBirth.length == 0) {
+		newUser.dateOfBirth = null;
+	}
 
 	// Hash Password
 	newUser.password = User.encrypted(newUser.password);
 
 	User.create(newUser, (error, data) => {
 		if (error) {
-			res.sendStatus(500);
+			res.status(500).send(error.sqlMessage);
 			return;
 		}
 
