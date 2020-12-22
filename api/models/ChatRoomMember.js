@@ -18,11 +18,17 @@ CREATE TABLE directMessageRecipients(
 class ChatRoomMember {
 	
 	constructor(model) {
-		this.id 	= model.id;
-		this.roomId	= model.roomId;
-		this.userId = model.userId;
-		this.isRead = model.isRead;
-		this.findByUserId = model.findByUserId;
+		this.id 			= model.id;
+		this.roomId			= model.roomId;
+		this.userId 		= model.userId;
+		this.isRead 		= model.isRead;
+		this.findByUserId 	= model.findByUserId;
+		this.createTime 	= model.createTime;
+		this.updateTime 	= model.updateTime;
+		this.deleteTime 	= model.deleteTime;
+		this.timeZone 		= model.timeZone;
+		this.regionCode 	= model.regionCode;
+		this.languageCode 	= model.languageCode;
 	}
 	
 	static findAll (next) {
@@ -44,13 +50,19 @@ var db = [
 		"id": 1,
 		"roomId": 1,
 		"userId": 15,
-		"isRead": 0
+		"isRead": 0,
+		"timeZone": "",
+    	"regionCode": "419",
+    	"languageCode": "en-US"
 	}),
 	new ChatRoomMember({
 		"id": 2,
 		"roomId": 1,
 		"userId": 14,
-		"isRead": 0
+		"isRead": 0,
+		"timeZone": "",
+    	"regionCode": "419",
+    	"languageCode": "en-US"
 	})
 ];
 

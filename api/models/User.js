@@ -29,16 +29,21 @@ ON user(email);
 */
 
 var User = function(model) {
-	this.id 		 = model.id;
-	this.username 	 = model.username;
-	this.password 	 = model.password;
-	this.email 		 = model.email;
-	this.firstName 	 = model.firstName;
-	this.lastName 	 = model.lastName;
-	this.preferredName = model.preferredName;
-	this.phoneNumber = model.phoneNumber;
-	this.dateOfBirth = model.dateOfBirth;
-	this.createdDate = model.createdDate;
+	this.id 		 	= model.id;
+	this.username 	 	= model.username;
+	this.password 	 	= model.password;
+	this.email 		 	= model.email;
+	this.firstName 	 	= model.firstName;
+	this.lastName 	 	= model.lastName;
+	this.preferredName 	= model.preferredName;
+	this.phoneNumber 	= model.phoneNumber;
+	this.birthDate 		= model.birthDate
+	this.createTime 	= model.createTime;
+	this.updateTime 	= model.updateTime;
+	this.deleteTime 	= model.deleteTime;
+	this.timeZone 		= model.timeZone;
+	this.regionCode 	= model.regionCode;
+	this.languageCode 	= model.languageCode;
 };
 
 User.findAll = (res) => {

@@ -22,18 +22,26 @@ class ChatMessage {
 	 * @api public
 	 */
 	constructor(model) {
-		this.id 				= model.id;
-		this.roomId				= model.roomId;
-		this.body 				= model.body;
-		this.parentMessageId 	= model.parentMessageId;
-		this.creatorId 			= model.creatorId;
-		this.createdDate 		= model.createdDate;
-		this.editedDate 		= model.editedDate;
+		this.id 			= model.id;
+		this.roomId			= model.roomId;
+		this.body 			= model.body;
+		this.parentId 		= model.parentId;
+		this.creatorId 		= model.creatorId;
+		this.createTime 	= model.createTime;
+		this.updateTime 	= model.updateTime;
+		this.deleteTime 	= model.deleteTime;
+		this.timeZone 		= model.timeZone;
+		this.regionCode 	= model.regionCode;
+		this.languageCode 	= model.languageCode;
 	}
 	
 	/**
 	 * @api public
 	 */
+	 
+	static create = (message, next) => {
+		
+	}
 	
 	static findById = (id, next) => {
 		next(null, db.find(message => message.id === id));
@@ -61,8 +69,11 @@ var db = [
 		"body": "Test message.",
 		"parentMessageId": 0,
 		"creatorId": 14,
-		"createdDate": Date(),
-		"editedDate": Date()
+		"createTime": Date(),
+		"updateTime": Date(),
+		"timeZone": "",
+    	"regionCode": "419",
+    	"languageCode": "en-US"
 	}),
 	new ChatMessage({
 		"id": 2,
@@ -70,8 +81,11 @@ var db = [
 		"body": "Test reply.",
 		"parentMessageId": 1,
 		"creatorId": 15,
-		"createdDate": Date(),
-		"editedDate": Date()
+		"createTime": Date(),
+		"updateTime": Date(),
+		"timeZone": "",
+    	"regionCode": "419",
+    	"languageCode": "en-US"
 	}),
 	new ChatMessage({
 		"id": 3,
@@ -79,8 +93,11 @@ var db = [
 		"body": "Test reply #2.",
 		"parentMessageId": 2,
 		"creatorId": 14,
-		"createdDate": Date(),
-		"editedDate": Date()
+		"createTime": Date(),
+		"updateTime": Date(),
+		"timeZone": "",
+    	"regionCode": "419",
+    	"languageCode": "en-US"
 	})
 ];
 

@@ -23,6 +23,6 @@ module.exports = (app) => {
 	app.route('/api/user/:id/preferred/:name')
 		.put(controller.updatePreferredName);
 		
-	app.route('/api/user/:id/updatepassword')
+	app.route('/api/user/:id/update/password')
 		.put(controller.updatePasswordForUserWithId);
 };

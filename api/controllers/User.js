@@ -1,49 +1,51 @@
 'use strict';
 
 var User = require('../models/User.js');
+var HttpError = require('../utils/HttpError.js');
+var HttpResponse = require('../utils/HttpResponse');
 
 exports.findAll = (req, res) => {
 	User.findAll( (error, data) => {
 		if (error)
-			res.send(error);
+			HttpError.send(500, error.sqlMessage, res);
 		else
-			res.send(data);
+			HttpResponse.send(data, res);
 	});
 };
 
 exports.findById = (req, res) => {
 	User.findById(req.params.id, (error, data) => {
 		if (error)
-			res.send(error);
+			HttpError.send(500, error.sqlMessage, res);
 		else
-			res.send(data);
+			HttpResponse.send(data, res);
 	});
 };
 
 exports.findByUsername = (req, res) => {
 	User.findByUsername(req.params.username, (error, data) => {
 		if (error)
-			res.send(error);
+			HttpError.send(500, error.sqlMessage, res);
 		else
-			res.send(data);
+			HttpRespnose.send(data, res);
 	});
 };
 
 exports.deleteById = (req, res) => {
 	User.deleteById(req.params.id, (error, data) => {
 		if (error)
-			res.send(error);
+			HttpError.sendError(sqlMessage, res);
 		else
-			res.send(data);
+			HttpResponse.send(data, res);
 	});
 };
 
 exports.deleteAll = (req, res) => {
 	User.deleteAll( (error, data) => {
 		if (error)
-			res.send(error);
+			HttpError.sendError(sqlMessage, res);
 		else
-			res.send(data);
+			HttpResponse.send(data, res);
 	});
 };
 
@@ -60,7 +62,7 @@ exports.deleteAll = (req, res) => {
 exports.login = (req, res) => {
 	
 	if (!req.body) {
-		res.status(400).send('Invalid body');
+		HttpError.send(400, 'Invalid body', res);
 		return;
 	}
 	
@@ -68,29 +70,29 @@ exports.login = (req, res) => {
 	let password = req.body.password;
 	
 	if (!username || !password) {
-		res.status(400).send('Username and password are required.');
+		HttpError.send(400, 'Username and password are required.', res);
 		return;
 	}
 
 	// User input should either be a valid email or valid username
 	if (!User.validUsername(username) && !User.validEmail(username)) {
-		res.status(400).send('Invalid credentials entered.');
+		HttpError.send(400, 'Invalid credentials entered.', res);
 		return;
 	}
 	
 	if (!User.validPassword(password)) {
-		res.status(400).send('Invalid password format.');
+		HttpError.send(400, 'Invalid password format.', res);
 		return;
 	}
 
 	User.findByUsernameOrEmail(username, (error, data) => {
 		if (error) {
-			res.status(500).send(error.sqlMessage);
+			HttpError.send(500, error.sqlMessage, res);
 			return
 		}
 		
 		if (data.length === 0) {
-			res.status(400).send('User was not found.');
+			HttpError.send(500, 'User was not found.', res);
 			return;
 		}
 
@@ -98,15 +100,12 @@ exports.login = (req, res) => {
 		
 		User.matching(password, user.password, (matched) => {
 			if (!matched) {
-				res.status(401).send('The username or password is invalid.');
+				HttpError.send(401, 'The username or password is invalid.', res);
 				return;
 			}
 			let lastLogin = new Date();
 			user.lastLogin = lastLogin;
-			res.status(200).send({
-				user: user,
-				message: 'OK'
-			});
+			HttpResponse.send(user, res);
 			User.updateLastLogin(user.id, lastLogin, (error, data) => {});
 		});
 	});
@@ -119,27 +118,27 @@ exports.create = (req, res) => {
 
 	// Validate user
 	if (!newUser) {
-		res.status(400).send('Invalid User');
+		HttpError.send(400, 'Invalid User', res);
 		return;
 	}
 
 	if (!User.validUsername(newUser.username)) {
-		res.status(400).send('Valid username is required.');
+		HttpError.send(400, 'Valid username is required.', res);
 		return;
 	}
 
 	if (!newUser.firstName || newUser.firstName.length <= 1 || !newUser.lastName || newUser.lastName.length <= 1) {
-		res.status(400).send('Valid first and last names are required.');
+		HttpError.send(400, 'Valid first and last names are required.', res);
 		return;
 	}
 
 	if (!User.validEmail(newUser.email)) {
-		res.status(400).send('Valid email is required.');
+		HttpError.send(400, 'Valid email is required.', res);
 		return;
 	}
 
 	if (!User.validPassword(newUser.password)) {
-		res.status(400).send('Password must be 6 characters minimum and contain 1 lowercase, 1 uppercase and 1 number');
+		HttpError.send(400, 'Password must be 6 characters minimum and contain 1 lowercase, 1 uppercase and 1 number', res);
 		return;
 	}
 	
@@ -152,12 +151,12 @@ exports.create = (req, res) => {
 
 	User.create(newUser, (error, data) => {
 		if (error) {
-			res.status(500).send(error.sqlMessage);
+			res.send(500, error.sqlMessage, res);
 			return;
 		}
 
 		console.log(`New user created: ${JSON.stringify(newUser)}`);
-		res.status(200).send(data);
+		HttpResponse.send(data, res);
 	});
 };
 
@@ -168,15 +167,12 @@ exports.create = (req, res) => {
 exports.updatePreferredName = (req, res) => {
 	const id = req.params.id;
 	const preferredName = decodeURI(req.params.name);
-	console.log(req.params.name, preferredName);
 	User.updatePreferredName(id, preferredName, (error, data) => {
 		if (error) {
-			res.sendStatus(500);
+			HttpError.send(500, 'Unable to update your preferred name at this time, please try again at a later time.', res);
 			return;
 		}
-		
-		console.log(`PreferredName updated: ${preferredName}`);
-		res.send(data);
+		HttpResponse.send(data, res);
 	});
 };
 
@@ -193,7 +189,7 @@ exports.updatePreferredName = (req, res) => {
  */
 exports.updatePasswordForUserWithId = (req, res) => {
 	if (!req.body || !req.params) {
-		res.sendStatus(400);
+		HttpError.send(400, 'Invalid entry.');
 		return;
 	}
 	
@@ -203,30 +199,30 @@ exports.updatePasswordForUserWithId = (req, res) => {
 	
 	// confirm oldPassword and newPasswords were received.
 	if (typeof oldPassword === undefined || typeof newPassword === undefined) {
-		res.sendStatus(400);
+		HttpError.send(400, 'OldPassword and NewPassword are required fields.', res);
 		return;
 	}
 	
 	// confirm password formats are correct.
 	if (!User.validPassword(oldPassword) || !User.validPassword(newPassword)) {
-		res.sendStatus(400);
+		HttpError.send(400, 'OldPassword and NewPassword must be valid.', res);
 		return;
 	};
 	
 	// cannot send matching passwords.
 	if (oldPassword === newPassword) {
-		res.sendStatus(400);
+		HttpError.send(400, 'OldPassword and NewPassword fields cannot be the same', res);
 		return;
 	}
 	
 	User.findById(id, (error, data) => {
 		if (error) {
-			res.sendStatus(500);
+			HttpError.send(500, 'Unable to update password at this time. Please try again at a later time.', res);
 			return;
 		}
 		
 		if (data.count === 0) {
-			res.sendStatus(400);
+			HttpError.send(400, 'User not found.', res);
 			return;
 		}
 		
@@ -234,17 +230,17 @@ exports.updatePasswordForUserWithId = (req, res) => {
 		
 		User.matching(oldPassword, user.password, (matched) => {
 			if (!matched) {
-				res.sendStatus(403);
-				return;	 
+				HttpError.send(403, 'Invalid password entered.', res);
+				return;	
 			}
 			
 			var newPasswordHashed = User.encrypted(newPassword);
 			User.updatePasswordForUserWithId(id, newPasswordHashed, (err, dat) => {
 				if (err) {
-					res.sendStatus(500);
+					HttpError.send(500, 'Unable to update password at this time. Please try again at a later time.', res);
 					return;
 				}
-				res.sendStatus(200);
+				HttpResponse.send(dat, res);
 			});
 		});
 	});

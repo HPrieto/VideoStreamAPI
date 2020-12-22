@@ -3,10 +3,14 @@
 class ChatRoom {
 	
 	constructor(model) {
-		this.id = model.id;
-		this.name = model.name;
-		this.createdDate = model.createdDate;
-		this.createdBy = model.createdBy;
+		this.id 			= model.id;
+		this.name 			= model.name;
+		this.createTime 	= model.createTime;
+		this.updateTime 	= model.updateTime;
+		this.deleteTime 	= model.deleteTime;
+		this.timeZone 		= model.timeZone;
+		this.regionCode 	= model.regionCode;
+		this.languageCode 	= model.languageCode;
 	}
 	
 	static findById = (id, done) => {
@@ -22,14 +26,20 @@ var db = [
 	new ChatRoom({
 		"id": 1,
 		"name": "Group 1",
-		"createdDate": Date(),
-		"createdBy": 1
+		"createTime": Date(),
+		"createdBy": 1,
+		"timeZone": "",
+    	"regionCode": "419",
+    	"languageCode": "en-US"
 	}),
 	new ChatRoom({
 		"id": 2,
 		"name": "Group 2",
-		"createdDate": Date(),
-		"createdBy": 2
+		"createTime": Date(),
+		"createdBy": 2,
+		"timeZone": "",
+    	"regionCode": "419",
+    	"languageCode": "en-US"
 	})
 ];
 
