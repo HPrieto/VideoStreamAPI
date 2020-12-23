@@ -19,9 +19,6 @@ module.exports = (app) => {
 
 	app.route('/api/user/login')
 		.post(controller.login);
-
-	app.route('/api/user/:id/preferred/:name')
-		.put(controller.updatePreferredName);
 		
 	app.route('/api/user/:id/update/password')
 		.put(controller.updatePasswordForUserWithId);

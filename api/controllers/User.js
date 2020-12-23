@@ -104,18 +104,19 @@ exports.login = (req, res) => {
 				HttpError.send(401, 'The username or password is invalid.', res);
 				return;
 			}
-			let lastLogin = new Date();
-			user.lastLogin = lastLogin;
+			user.lastLoginTime = new Date();
 			HttpResponse.send(user, res);
-			User.updateLastLogin(user.id, lastLogin, (error, data) => {});
+			User.updateLastLogin(user.id, (error, data) => {});
 		});
 	});
 };
 
 exports.create = (req, res) => {
 	var newUser = new User(req.body);
-	delete newUser.id;
-	newUser.createdDate = new Date();
+	
+	if (newUser.id) {
+		delete newUser.id;
+	}
 
 	// Validate user
 	if (!newUser) {
@@ -146,16 +147,23 @@ exports.create = (req, res) => {
 	if (typeof newUser.dateOfBirth === "string" && newUser.dateOfBirth.length == 0) {
 		newUser.dateOfBirth = null;
 	}
+	
+	if (!newUser.createTime) {
+		newUser.createTime = new Date();
+	}
+	
+	if (!newUser.updateTime) {
+		newUser.updateTime = new Date();
+	}
 
 	// Hash Password
 	newUser.password = User.encrypted(newUser.password);
 
 	User.create(newUser, (error, data) => {
 		if (error) {
-			res.send(500, error.sqlMessage, res);
+			HttpError.sendError(error, res);
 			return;
 		}
-
 		console.log(`New user created: ${JSON.stringify(newUser)}`);
 		HttpResponse.send(data, res);
 	});
@@ -164,18 +172,6 @@ exports.create = (req, res) => {
 /**
  * Controller Update
  */
-
-exports.updatePreferredName = (req, res) => {
-	const id = req.params.id;
-	const preferredName = decodeURI(req.params.name);
-	User.updatePreferredName(id, preferredName, (error, data) => {
-		if (error) {
-			HttpError.send(500, 'Unable to update your preferred name at this time, please try again at a later time.', res);
-			return;
-		}
-		HttpResponse.send(data, res);
-	});
-};
 
 /**
  * Updates password for user with given id.
@@ -261,11 +257,22 @@ exports.follow = (req, res) => {
 	var followerId = parseInt(req.params.followerId);
 	var userId = parseInt(req.params.userId);
 	
-	Follower.create(userId, followerId, (error, data) => {
-		if (error)
-			HttpError.sendError(error, res);
-		else
-			HttpResponse.send(data, res);
+	Follower.findByUserIdAndFollowerId(userId, followerId, (error, data) => {
+		if (error) {
+			HttpError.sendError(error);
+			return;
+		}
+		if (data.length > 0) {
+			HttpError.send(409, 'Duplicate record.', res);
+			return;
+		}
+		
+		Follower.create(userId, followerId, (err, dat) => {
+			if (err)
+				HttpError.sendError(err, res);
+			else
+				HttpResponse.send(dat, res);
+		});
 	});
 }
 

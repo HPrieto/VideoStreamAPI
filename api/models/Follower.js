@@ -12,20 +12,68 @@ class Follower {
 	}
 	
 	static create = (userId, followerId, res) => {
-		console.log(`${followerId} followed ${userId}`);
-		res(null, "OK");
-	}
-	
-	static findByUserId = (userId, res) => {
-		res(null, db.filter(x => x.userId === userId));
-	}
-	
-	static findByFollowerId = (followerId, res) => {
-		res(null, db.filter(x => x.followerId === followerId));
+		connection.query(
+			"INSERT INTO followers SET ?",
+			{ "userId": userId, "followerId": followerId },
+			(error, data) => {
+				if (error)
+					res(error, null);
+				else
+					res(null, data);
+			}
+		)
 	}
 	
 	static delete = (userId, followerId, res) => {
-		res(null, db.filter(x => x.followerId === followerId && x.userId === userId));
+		connection.query(
+			"DELETE FROM followers WHERE userId = ? AND followerId = ?",
+			[userId, followerId],
+			(error, data) => {
+				if (error)
+					res(error, null);
+				else
+					res(null, data);
+			}
+		)
+	}
+	
+	static findByUserId = (userId, res) => {
+		connection.query(
+			"SELECT * FROM followers WHERE userId = ? ORDER BY followerId",
+			userId,
+			(error, data) => {
+				if (error)
+					res(error, null);
+				else
+					res(null, data);
+			}	
+		)
+	}
+	
+	static findByFollowerId = (followerId, res) => {
+		connection.query(
+			"SELECT * FROM followers WHERE followerId = ? ORDER BY userId",
+			followerId,
+			(error, data) => {
+				if (error)
+					res(error, null);
+				else
+					res(null, data);
+			}
+		)
+	}
+	
+	static findByUserIdAndFollowerId = (userId, followerId, res) => {
+		connection.query(
+			"SELECT * FROM followers WHERE userId = ? AND followerId = ? ORDER BY createTime",
+			[userId, followerId],
+			(error, data) => {
+				if (error)
+					res(error, null);
+				else
+					res(null, data);
+			}
+		)
 	}
 };
 

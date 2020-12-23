@@ -6,13 +6,14 @@ const saltRounds = 10;
 
 var User = function(model) {
 	this.id 		 	= model.id;
+	this.token			= model.token;
 	this.username 	 	= model.username;
 	this.password 	 	= model.password;
 	this.email 		 	= model.email;
 	this.firstName 	 	= model.firstName;
 	this.lastName 	 	= model.lastName;
-	this.preferredName 	= model.preferredName;
 	this.phoneNumber 	= model.phoneNumber;
+	this.description	= model.description;
 	this.birthDate 		= model.birthDate;
 	this.createTime 	= model.createTime;
 	this.updateTime 	= model.updateTime;
@@ -47,6 +48,19 @@ User.findById = (id, res) => {
 		}
 	);
 };
+
+User.findByToken = (token, res) => {
+	connection.query(
+		"SELECT * FROM users WHERE token = ?",
+		token,
+		(error, data) => {
+			if (error)
+				res(error, null);
+			else
+				res(null, data);
+		}
+	);
+}
 
 User.findByUsername = (username, res) => {
 	connection.query(
@@ -116,23 +130,11 @@ User.deleteById = (id, res) => {
 };
 
 // MARK: - PUT
-User.updatePreferredName = (id, preferredName, res) => {
-	connection.query(
-		"UPDATE users SET preferredName = ? WHERE id  = ?",
-		[preferredName, id],
-		(error, data) => {
-			if (error)
-				res(error, null);
-			else 
-				res(null, data);
-		}
-	);
-};
 
-User.updateLastLogin = (id, lastLogin, res) => {
+User.updateLastLogin = (id, res, lastLoginTime = new Date()) => {
 	connection.query(
-		"UPDATE users SET lastLogin = ? WHERE id = ?",
-		[lastLogin, id],
+		"UPDATE users SET lastLoginTime = ? WHERE id = ?",
+		[lastLoginTime, id],
 		(error, data) => {
 			if (error)
 				res(error, null);
@@ -226,11 +228,13 @@ users table schema:
 
 CREATE TABLE users(
 	id INT NOT NULL AUTO_INCREMENT,
+	token VARCHAR(256),
 	username VARCHAR(64) NOT NULL,
 	password VARCHAR(128) NOT NULL,
 	firstName VARCHAR(64) NOT NULL,
 	lastName VARCHAR(64),
 	email VARCHAR(64) NOT NULL,
+	description VARCHAR(256),
 	phoneNumber VARCHAR(32),
 	birthDate DATE,
 	lastLoginTime DATETIME,
@@ -242,6 +246,9 @@ CREATE TABLE users(
 	languageCode VARCHAR(32),
 	imageUrl VARCHAR(256),
 	PRIMARY KEY (id),
-	UNIQUE (id, username, email)
+	UNIQUE (id),
+	UNIQUE (username),
+	UNIQUE (email),
+	UNIQUE (token)
 );
 */

@@ -17,6 +17,10 @@ class HttpError {
 		"504": "DEADLINE_EXCEEDED"
 	};
 	
+	static databaseErrorCodes = {
+		"1062": "ER_DUP_ENTRY"
+	}
+	
 	static send(statusCode, message, res) {
 		res.status(statusCode).send({
 			"error": {
@@ -28,12 +32,12 @@ class HttpError {
 	}
 	
 	static sendError(error, res) {
-		HttpError.send(500, error.sqlMessage, res);
+		HttpError.send(500, HttpError.getDatabaseErrorStatus(error.errno), res);
 	}
 	
 	static getStatus(statusCode) {
 		if (isNaN(statusCode)) {
-			throw new Error("`statusCode` must be a number.");
+			return "INTERNAL";
 		}
 		
 		if (!HttpError.errorCodes[statusCode]) {
@@ -41,6 +45,18 @@ class HttpError {
 		}
 		
 		return HttpError.errorCodes[statusCode];
+	}
+	
+	static getDatabaseErrorStatus(databaseErrorCode) {
+		if (isNaN(databaseErrorCode)) {
+			return "INTERNAL";
+		}
+		
+		if (!HttpError.databaseErrorCodes[databaseErrorCode]) {
+			return HttpError.getStatus(500);
+		}
+		
+		return HttpError.databaseErrorCodes[databaseErrorCode];
 	}
 }
 
