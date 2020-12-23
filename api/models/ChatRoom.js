@@ -36,11 +36,23 @@ var db = [
 		"id": 2,
 		"name": "Group 2",
 		"createTime": Date(),
-		"createdBy": 2,
-		"timeZone": "",
-    	"regionCode": "419",
-    	"languageCode": "en-US"
+		"createdBy": 2
 	})
 ];
 
 module.exports = ChatRoom;
+
+/**
+
+`chatRooms` table schema:
+
+CREATE TABLE chatRooms(
+	id INT NOT NULL AUTO_INCREMENT,
+	userId int NOT NULL,
+	name VARCHAR(64),
+	createTime DATETIME,
+	FOREIGN KEY (userId) REFERENCES users(id),
+	UNIQUE (id)
+);
+
+*/

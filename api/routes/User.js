@@ -25,4 +25,18 @@ module.exports = (app) => {
 		
 	app.route('/api/user/:id/update/password')
 		.put(controller.updatePasswordForUserWithId);
+		
+	// Followers
+	
+	app.route('/api/user/:userId/followers')
+		.get(controller.findFollowersByUserId);
+	
+	app.route('/api/user/:followerId/following')
+		.get(controller.findFollowersByFollowerId);
+		
+	app.route('/api/user/:followerId/followed/:userId')
+		.post(controller.follow);
+	
+	app.route('/api/user/:followerId/unfollowed/:userId')
+		.delete(controller.unfollow);
 };

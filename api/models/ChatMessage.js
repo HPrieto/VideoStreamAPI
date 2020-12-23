@@ -2,19 +2,6 @@
 
 var connection = require('../database/mysql');
 
-/**
- `directMessages` table schema:
- 
- CREATE TABLE directMessages(
- 	id INT NOT NULL AUTO_INCREMENT,
- 	body BLOB,
- 	parentMessageId INT,
- 	creatorId INT NOT NULL,
- 	createdDate DATETIME,
- 	editedDate DATETIME
- )
-*/
-
 class ChatMessage {
 	
 	/**
@@ -55,6 +42,10 @@ class ChatMessage {
 		next(null, db.filter(x => x.creatorId === creatorId));
 	}
 	
+	static findByParentId = (parentId, next) => {
+		next(null, db.filter(x => x.parentId === parentId));
+	}
+	
 	static updateMessageBody = (id, newBody, next) => {
 		var directMessage = db.find(message => message.id === id);
 		directMessage.body = newBody
@@ -67,7 +58,7 @@ var db = [
 		"id": 1,
 		"roomId": 1,
 		"body": "Test message.",
-		"parentMessageId": 0,
+		"parentId": 0,
 		"creatorId": 14,
 		"createTime": Date(),
 		"updateTime": Date(),
@@ -79,7 +70,7 @@ var db = [
 		"id": 2,
 		"roomId": 1,
 		"body": "Test reply.",
-		"parentMessageId": 1,
+		"parentId": 1,
 		"creatorId": 15,
 		"createTime": Date(),
 		"updateTime": Date(),
@@ -91,7 +82,7 @@ var db = [
 		"id": 3,
 		"roomId": 1,
 		"body": "Test reply #2.",
-		"parentMessageId": 2,
+		"parentId": 2,
 		"creatorId": 14,
 		"createTime": Date(),
 		"updateTime": Date(),
@@ -102,3 +93,26 @@ var db = [
 ];
 
 module.exports = ChatMessage;
+
+/**
+
+`chatMessages` table schema;
+
+CREATE TABLE chatMessages(
+	id INT NOT NULL AUTO_INCREMENT,
+	roomId INT NOT NULL,
+	userId INT NOT NULL,
+	body VARCHAR(512),
+	parentId INT,
+	createTime DATETIME,
+	updateTime DATETIME,
+	timeZone VARCHAR(32),
+	regionCode VARCHAR(32),
+	languageCode VARCHAR(32),
+	PRIMARY KEY (id),
+	FOREIGN KEY (roomId) REFERENCES chatRooms(id),
+	FOREIGN KEY (userId) REFERENCES users(id),
+	UNIQUE (id)
+);
+
+ */

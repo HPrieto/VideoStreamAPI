@@ -1,6 +1,7 @@
 'use strict';
 
 var User = require('../models/User.js');
+var Follower = require('../models/Follower');
 var HttpError = require('../utils/HttpError.js');
 var HttpResponse = require('../utils/HttpResponse');
 
@@ -243,5 +244,81 @@ exports.updatePasswordForUserWithId = (req, res) => {
 				HttpResponse.send(dat, res);
 			});
 		});
+	});
+};
+
+/**
+ * Creates a new `followers` record in mysql database.
+ * @param {object} req.params: { "followerId": {number}, "userId": {number} }
+ * @api public
+ */
+exports.follow = (req, res) => {
+	if (isNaN(req.params.followerId) || isNaN(req.params.userId)) {
+		HttpError.send(400, 'Invalid request.', res);
+		return;
+	}
+	
+	var followerId = parseInt(req.params.followerId);
+	var userId = parseInt(req.params.userId);
+	
+	Follower.create(userId, followerId, (error, data) => {
+		if (error)
+			HttpError.sendError(error, res);
+		else
+			HttpResponse.send(data, res);
+	});
+}
+
+/**
+ * Deletes a `followers` record in mysql database.
+ * @param {object} req.params: { "followerId": {number}, "userId": {number} }
+ * @api public
+ */
+exports.unfollow = (req, res) => {
+	if (isNaN(req.params.followerId) || isNaN(req.params.userId)) {
+		HttpError.send(400, 'Invalid request.', res);
+		return;
+	}
+	
+	var followerId = parseInt(req.params.followerId);
+	var userId = parseInt(req.params.userId);
+	
+	Follower.delete(userId, followerId, (error, data) => {
+		if (error)
+			HttpError.sendError(error, res);
+		else
+			HttpResponse.send(data, res);
+	});
+};
+
+exports.findFollowersByFollowerId = (req, res) => {
+	if (isNaN(req.params.followerId)) {
+		HttpError.send(400, 'Invalid request.', res);
+		return;
+	}
+	
+	var followerId = parseInt(req.params.followerId);
+	
+	Follower.findByFollowerId(followerId, (error, data) => {
+		if (error)
+			HttpError.sendError(error, res);
+		else
+			HttpResponse.send(data, res);
+	});
+};
+
+exports.findFollowersByUserId = (req, res) => {
+	if (isNaN(req.params.userId)) {
+		HttpError.send(400, 'Invalid request.', res);
+		return;
+	}
+	
+	var userId = parseInt(req.params.userId);
+	
+	Follower.findByUserId(userId, (error, data) => {
+		if (error)
+			HttpError.sendError(error, res);
+		else
+			HttpResponse.send(data, res);
 	});
 };

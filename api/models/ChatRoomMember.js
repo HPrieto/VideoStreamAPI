@@ -2,19 +2,6 @@
 
 var connection = require('../database/mysql');
 
-/**
-
-directMessageRecipients table schema:
-
-CREATE TABLE directMessageRecipients(
-	id INT NOT NULL AUTO_INCREMENT,
-	recipientId INT NOT NULL,
-	messageId INT NOT NULL,
-	isRead TINYINT(1)
-)
-
-*/
-
 class ChatRoomMember {
 	
 	constructor(model) {
@@ -67,3 +54,23 @@ var db = [
 ];
 
 module.exports = ChatRoomMember;
+
+/**
+
+`chatRoomMember` table schema:
+
+CREATE TABLE chatRoomMembers(
+	id INT NOT NULL AUTO_INCREMENT,
+	roomId INT NOT NULL,
+	userId INT NOT NULL,
+	isAdmin TINYINT(1) DEFAULT 0,
+	timeZone VARCHAR(32),
+	regionCode VARCHAR(32),
+	languageCode VARCHAR(32),
+	PRIMARY KEY (id),
+	FOREIGN KEY (roomId) REFERENCES chatRooms(id),
+	FOREIGN KEY (userId) REFERENCES users(id),
+	UNIQUE (id)
+);
+
+*/

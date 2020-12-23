@@ -12,9 +12,9 @@ class ChatModel {
 		if (!model.hasOwnProperty('members')) {
 			throw new Error('`members` is a required property.');
 		}
-		this.room = model.room;
-		this.messages = model.messages;
-		this.members = model.members;
+		this.room 		= model.room;
+		this.messages 	= model.messages;
+		this.members 	= model.members;
 	}
 }
 

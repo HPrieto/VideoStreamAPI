@@ -4,30 +4,6 @@ var connection = require('../database/mysql');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-/**
-user table schema:
-
-CREATE TABLE user(
-	id INT NOT NULL AUTO_INCREMENT,
-	username VARCHAR(40) NOT NULL,
-	password VARCHAR(50) NOT NULL,
-	firstName VARCHAR(40) NOT NULL,
-	lastName VARCHAR(40) NOT NULL,
-	email VARCHAR(50) NOT NULL,
-	phoneNumber VARCHAR(20),
-	dateOfBirth DATE,
-	lastLogin DATETIME,
-	createdDate DATETIME,
-	PRIMARY KEY (id)
-);
-
-CREATE UNIQUE INDEX unique_username
-ON user(username);
-
-CREATE UNIQUE INDEX unique_email
-ON user(email);
-*/
-
 var User = function(model) {
 	this.id 		 	= model.id;
 	this.username 	 	= model.username;
@@ -37,13 +13,14 @@ var User = function(model) {
 	this.lastName 	 	= model.lastName;
 	this.preferredName 	= model.preferredName;
 	this.phoneNumber 	= model.phoneNumber;
-	this.birthDate 		= model.birthDate
+	this.birthDate 		= model.birthDate;
 	this.createTime 	= model.createTime;
 	this.updateTime 	= model.updateTime;
 	this.deleteTime 	= model.deleteTime;
 	this.timeZone 		= model.timeZone;
 	this.regionCode 	= model.regionCode;
 	this.languageCode 	= model.languageCode;
+	this.imageUrl		= model.imageUrl;
 };
 
 User.findAll = (res) => {
@@ -243,3 +220,28 @@ User.validString = (str, regex) => {
 
 
 module.exports = User;
+
+/**
+users table schema:
+
+CREATE TABLE users(
+	id INT NOT NULL AUTO_INCREMENT,
+	username VARCHAR(64) NOT NULL,
+	password VARCHAR(128) NOT NULL,
+	firstName VARCHAR(64) NOT NULL,
+	lastName VARCHAR(64),
+	email VARCHAR(64) NOT NULL,
+	phoneNumber VARCHAR(32),
+	birthDate DATE,
+	lastLoginTime DATETIME,
+	createTime DATETIME,
+	deleteTime DATETIME,
+	updateTime DATETIME,
+	timeZone VARCHAR(32),
+	regionCode VARCHAR(32),
+	languageCode VARCHAR(32),
+	imageUrl VARCHAR(256),
+	PRIMARY KEY (id),
+	UNIQUE (id, username, email)
+);
+*/
