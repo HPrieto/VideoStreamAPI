@@ -47,7 +47,7 @@ class ChatMessage {
 		}
 		
 		connection.query(
-			"DELETE FROM chatMessages WHERE ? = ?",
+			"DELETE FROM chatMessages WHERE ?? = ?",
 			['id', id],
 			(error, data) => {
 				if (error)
@@ -65,7 +65,7 @@ class ChatMessage {
 		}
 		
 		connection.query(
-			"SELECT * FROM chatMessages WHERE ? = ?",
+			"SELECT * FROM chatMessages WHERE ?? = ?",
 			['id', id],
 			(error, data) => {
 				if (error)
@@ -83,7 +83,7 @@ class ChatMessage {
 		}
 		
 		connection.query(
-			"SELECT * FROM chatMessages WHERE ? = ?",
+			"SELECT * FROM chatMessages WHERE ?? = ?",
 			['roomId', roomId],
 			(error, data) => {
 				if (error)
@@ -101,7 +101,7 @@ class ChatMessage {
 		}
 		
 		connection.query(
-			"SELECT * FROM chatMessages WEHRE ? = ?",
+			"SELECT * FROM chatMessages WEHRE ?? = ?",
 			['roomId', roomId],
 			(error, data) => {
 				if (error)
@@ -119,7 +119,7 @@ class ChatMessage {
 		}
 		
 		connection.query(
-			"SELECT * FROM chatMessages WHERE ? = ?",
+			"SELECT * FROM chatMessages WHERE ?? = ?",
 			['parentId', parentId],
 			(error, data) => {
 				if (error)
@@ -143,7 +143,7 @@ class ChatMessage {
 		}
 		
 		connection.query(
-			"UPDATE chatMessages SET ? = ? AND updateTime = CURRENT_TIMESTAMP WHERE ? = ?",
+			"UPDATE chatMessages SET ?? = ? AND updateTime = CURRENT_TIMESTAMP WHERE ?? = ?",
 			['body', newBody, 'id', id],
 			(error, data) => {
 				if (error)
@@ -154,45 +154,6 @@ class ChatMessage {
 		);
 	};
 };
-
-var db = [
-	new ChatMessage({
-		"id": 1,
-		"roomId": 1,
-		"body": "Test message.",
-		"parentId": 0,
-		"senderId": 14,
-		"sendTime": Date(),
-		"updateTime": Date(),
-		"timeZone": "",
-    	"regionCode": "419",
-    	"languageCode": "en-US"
-	}),
-	new ChatMessage({
-		"id": 2,
-		"roomId": 1,
-		"body": "Test reply.",
-		"parentId": 1,
-		"senderId": 15,
-		"sendTime": Date(),
-		"updateTime": Date(),
-		"timeZone": "",
-    	"regionCode": "419",
-    	"languageCode": "en-US"
-	}),
-	new ChatMessage({
-		"id": 3,
-		"roomId": 1,
-		"body": "Test reply #2.",
-		"parentId": 2,
-		"senderId": 14,
-		"sendTime": Date(),
-		"updateTime": Date(),
-		"timeZone": "",
-    	"regionCode": "419",
-    	"languageCode": "en-US"
-	})
-];
 
 module.exports = ChatMessage;
 

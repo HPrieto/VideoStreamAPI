@@ -9,7 +9,7 @@ class Follower {
 		this.userId = model.userId;
 		this.followerId = model.followerId;
 		this.createTime = model.createTime;
-	}
+	};
 	
 	static create = (userId, followerId, next) => {
 		connection.query(
@@ -22,11 +22,11 @@ class Follower {
 					next(null, data);
 			}
 		)
-	}
+	};
 	
 	static delete = (userId, followerId, next) => {
 		connection.query(
-			"DELETE FROM followers WHERE ? = ? AND ? = ?",
+			"DELETE FROM followers WHERE ?? = ? AND ?? = ?",
 			['userId', userId, 'followerId', followerId],
 			(error, data) => {
 				if (error)
@@ -35,7 +35,7 @@ class Follower {
 					next(null, data);
 			}
 		)
-	}
+	};
 	
 	static findByUserId = (userId, next) => {
 		var query = "SELECT \n" +
@@ -50,7 +50,7 @@ class Follower {
 			"followers b \n" +
 			"WHERE \n" +
 			"a.id = b.userId \n" +
-			"AND ? = ?";
+			"AND ?? = ?";
 			
 		connection.query(
 			query,
@@ -62,7 +62,7 @@ class Follower {
 					next(null, data);
 			}	
 		)
-	}
+	};
 	
 	static findByFollowerId = (followerId, next) => {
 		var query = "SELECT \n" +
@@ -77,7 +77,7 @@ class Follower {
 			"followers b \n" +
 			"WHERE \n" +
 			"a.id = b.followerId \n" +
-			"AND ? = ?";
+			"AND ?? = ?";
 		
 		connection.query(
 			query,
@@ -89,11 +89,11 @@ class Follower {
 					next(null, data);
 			}
 		)
-	}
+	};
 	
 	static findByUserIdAndFollowerId = (userId, followerId, next) => {
 		connection.query(
-			"SELECT * FROM followers WHERE ? = ? AND ? = ? ORDER BY createTime",
+			"SELECT * FROM followers WHERE ?? = ? AND ?? = ? ORDER BY createTime",
 			['userId', userId, 'followerId', followerId],
 			(error, data) => {
 				if (error)
@@ -102,17 +102,8 @@ class Follower {
 					next(null, data);
 			}
 		)
-	}
+	};
 };
-
-var db = [
-	new Follower({
-		"id": 1,
-		"userId": 14,
-		"followerId": 15,
-		"createTime": Date()
-	})
-];
 
 module.exports = Follower;
 

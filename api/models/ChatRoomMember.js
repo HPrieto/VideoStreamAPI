@@ -32,7 +32,7 @@ class ChatRoomMember {
 	
 	static findById (id, next) {
 		connection.query(
-			"SELECT * FROM chatRoomMembers WHERE ? = ?",
+			"SELECT * FROM chatRoomMembers WHERE ?? = ?",
 			['id', id],
 			(error, data) => {
 				if (error)
@@ -45,7 +45,7 @@ class ChatRoomMember {
 	
 	static findByUserId (userId, next) {
 		connection.query(
-			"SELECT * FROM chatRoomMembers WHERE ? = ?",
+			"SELECT * FROM chatRoomMembers WHERE ?? = ?",
 			['userId', userId],
 			(error, data) => {
 				if (error)
@@ -58,7 +58,7 @@ class ChatRoomMember {
 	
 	static findByRoomId (roomId, next) {
 		connection.query(
-			"SELECT * FROM chatRoomMembers WHERE ? = ?",
+			"SELECT * FROM chatRoomMembers WHERE ?? = ?",
 			['roomId', roomId],
 			(error, data) => {
 				if (error)
@@ -84,7 +84,7 @@ class ChatRoomMember {
 	
 	static delete (roomId, userId, next) {
 		connection.query(
-			"DELETE * FROM chatRoomMembers WHERE ? = ? AND ? = ?",
+			"DELETE * FROM chatRoomMembers WHERE ?? = ? AND ?? = ?",
 			['roomId', roomId, 'userId', userId],
 			(error, data) => {
 				if (error) {
@@ -98,7 +98,7 @@ class ChatRoomMember {
 	
 	static makeAdmin (roomId, userId, next) {
 		connection.query(
-			"UPDATE chatRoomMembers SET isAdmin = 1 WHERE ? = ? AND ? = ?",
+			"UPDATE chatRoomMembers SET isAdmin = 1 WHERE ?? = ? AND ?? = ?",
 			['roomId', roomId, 'userId', userId],
 			(error, data) => {
 				if (error)
@@ -111,7 +111,7 @@ class ChatRoomMember {
 	
 	static removeAdmin (roomId, userId, next) {
 		connection.query(
-			"UPDATE chatRoomMembers SET isAdmin = 0 WHERE ? = ? AND ? = ?",
+			"UPDATE chatRoomMembers SET isAdmin = 0 WHERE ?? = ? AND ?? = ?",
 			['roomId', roomId, 'userId', userId],
 			(error, data) => {
 				if (error)
@@ -122,27 +122,6 @@ class ChatRoomMember {
 		);
 	};
 };
-
-var db = [
-	new ChatRoomMember({
-		"id": 1,
-		"roomId": 1,
-		"userId": 15,
-		"isRead": 0,
-		"timeZone": "",
-    	"regionCode": "419",
-    	"languageCode": "en-US"
-	}),
-	new ChatRoomMember({
-		"id": 2,
-		"roomId": 1,
-		"userId": 14,
-		"isRead": 0,
-		"timeZone": "",
-    	"regionCode": "419",
-    	"languageCode": "en-US"
-	})
-];
 
 module.exports = ChatRoomMember;
 

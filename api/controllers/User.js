@@ -44,8 +44,28 @@ exports.isUsernameAvailable = (req, res) => {
 	User.findByUsername(username, (error, data) => {
 		if (error)
 			HttpError.send(500, error.sqlMessage, res);
+		else if (data.length === 0) 
+			HttpResponse.send({ "available": true, "message": "Username is available." }, res);
 		else
-			HttpResponse.send({ "available": data.length === 0 }, res);
+			HttpResponse.send({ "available": false, "message": "Username is already taken." }, res);
+	});
+};
+
+exports.isEmailAvailable = (req, res) => {
+	var email = req.params.email;
+	console.log(email);
+	if (typeof email === 'undefined' || !validator.isEmail(email)) {
+		HttpError.send(400, 'A valid email is required.', res);
+		return;
+	}
+	
+	User.findByEmail(email, (error, data) => {
+		if (error)
+			HttpError.sendError(error, res);
+		else if (data.length === 0)
+			HttpResponse.send({ "available": true, "message": "Username is available." });
+		else
+			HttpResponse.send({ "available": false, "message": "Username is already taken." }, res);
 	});
 };
 

@@ -39,7 +39,7 @@ User.findAll = (res) => {
 
 User.findById = (id, res) => {
 	connection.query(
-		"SELECT * FROM users WHERE ? = ? ORDER BY id",
+		"SELECT * FROM users WHERE ?? = ? ORDER BY id",
 		['id', id],
 		(error, data) => {
 			if (error) {
@@ -53,7 +53,7 @@ User.findById = (id, res) => {
 
 User.findByToken = (token, res) => {
 	connection.query(
-		"SELECT * FROM users WHERE ? = ?",
+		"SELECT * FROM users WHERE ?? = ?",
 		['token', token],
 		(error, data) => {
 			if (error)
@@ -66,8 +66,8 @@ User.findByToken = (token, res) => {
 
 User.findByUsername = (username, res) => {
 	connection.query(
-		"SELECT id, username, firstName, lastName, email, description, phoneNumber, birthDate, imageUrl FROM users WHERE LOWER(?) = LOWER(?) ORDER BY username",
-		['username',username],
+		"SELECT id, username, firstName, lastName, email, description, phoneNumber, birthDate, imageUrl FROM users WHERE ?? = ? ORDER BY username",
+		["username",username],
 		(error, data) => {
 			if (error) {
 				res(error, null);
@@ -80,8 +80,8 @@ User.findByUsername = (username, res) => {
 
 User.findByEmail = (email, res) => {
 	connection.query(
-		"SELECT * FROM users WHERE LOWER(?) = LOWER(?) LIMIT 1",
-		['email', email],
+		"SELECT * FROM users WHERE ?? LIKE ?",
+		[`email`, email],
 		(error, data) => {
 			if (error) {
 				res(error, null);
@@ -94,7 +94,7 @@ User.findByEmail = (email, res) => {
 
 User.findByUsernameOrEmail = (username, email, res) => {
 	connection.query(
-		"SELECT * FROM users WHERE LOWER(?) = LOWER(?) OR LOWER(?) = LOWER(?)",
+		"SELECT * FROM users WHERE ?? LIKE ? OR ?? = ?",
 		['username', username, 'email', email],
 		(error, data) => {
 			if (error) {
@@ -108,7 +108,7 @@ User.findByUsernameOrEmail = (username, email, res) => {
 
 User.findByUsernameOrEmail = (usernameOrEmail, res) => {
 	connection.query(
-		"SELECT * FROM users WHERE ? = ? OR ? = ? LIMIT 1",
+		"SELECT * FROM users WHERE ?? = ? OR ?? = ? LIMIT 1",
 		['username', usernameOrEmail, 'email', usernameOrEmail],
 		(error, data) => {
 			if (error) {
@@ -148,7 +148,7 @@ User.deleteAll = (res) => {
 
 User.deleteById = (id, res) => {
 	connection.query(
-		"DELETE FROM users WHERE ? = ?",
+		"DELETE FROM users WHERE ?? = ?",
 		['id', id],
 		(error, data) => {
 			if (error)
@@ -163,7 +163,7 @@ User.deleteById = (id, res) => {
 
 User.updateLastLogin = (id, res, lastLoginTime = new Date()) => {
 	connection.query(
-		"UPDATE users SET ? = ? WHERE ? = ?",
+		"UPDATE users SET ?? = ? WHERE ?? = ?",
 		['lastLoginTime', lastLoginTime, 'id', id],
 		(error, data) => {
 			if (error)
@@ -183,7 +183,7 @@ User.updateLastLogin = (id, res, lastLoginTime = new Date()) => {
  */
 User.updatePasswordForUserWithId = (id, newPassword, res) => {
 	connection.query(
-		"UPDATE users SET ? = ?, updateTime = CURRENT_TIMESTAMP WHERE ? = ?",
+		"UPDATE users SET ?? = ?, updateTime = CURRENT_TIMESTAMP WHERE ?? = ?",
 		['password', newPassword, 'id', id],
 		(error, data) => {
 			if (error)
@@ -201,7 +201,7 @@ User.updatePasswordForUserWithId = (id, newPassword, res) => {
  */
 User.updateEmailForUserWithId = (id, newEmail, res) => {
 	connection.query(
-		"UPDATE users SET ? = ?, updateTime = CURRENT_TIMESTAMP WHERE ? = ?",
+		"UPDATE users SET ?? = ?, updateTime = CURRENT_TIMESTAMP WHERE ?? = ?",
 		['email', newEmail, 'id', id],
 		(error, data) => {
 			if (error)
@@ -219,7 +219,7 @@ User.updateEmailForUserWithId = (id, newEmail, res) => {
  */
 User.updateDescriptionForUserWithId = (id, newDescription, res) => {
 	connection.query(
-		"UPDATE users SET ? = ?, updateTime = CURRENT_TIMESTAMP WHERE ? = ?",
+		"UPDATE users SET ?? = ?, updateTime = CURRENT_TIMESTAMP WHERE ?? = ?",
 		['description', newDescription, 'id', id],
 		(error, data) => {
 			if (error)

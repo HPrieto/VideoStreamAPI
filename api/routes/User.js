@@ -16,6 +16,9 @@ module.exports = (app) => {
 		
 	app.route('/api/users/username/:username/available')
 		.get(controller.isUsernameAvailable);
+	
+	app.route('/api/users/email/:email/available')
+		.get(controller.isEmailAvailable);
 
 	app.route('/api/users/signup')
 		.post(controller.create);
