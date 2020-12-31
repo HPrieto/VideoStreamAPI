@@ -13,13 +13,18 @@ class ChatRoom {
 		this.languageCode 	= model.languageCode;
 	}
 	
-	static findById = (id, done) => {
-		done(null, db.filter(x => x.id === id));
-	}
-	
-	static findByIds = (roomIds, next) => {
-		next(null, db.filter(x => roomIds.includes(x.id)));
-	}
+	static findById = (id, next) => {
+		connection.query(
+			"SELECT * FROM chatRooms WHERE ? = ?",
+			['id', id],
+			(error, data) => {
+				if (error)
+					next(error, null);
+				else
+					next(null, data);
+			}
+		);
+	};
 }
 
 var db = [
@@ -50,7 +55,7 @@ CREATE TABLE chatRooms(
 	id INT NOT NULL AUTO_INCREMENT,
 	userId int NOT NULL,
 	name VARCHAR(64),
-	createTime DATETIME,
+	createTime DATETIME DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (userId) REFERENCES users(id),
 	UNIQUE (id)
 );

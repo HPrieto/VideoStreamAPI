@@ -16,20 +16,111 @@ class ChatRoomMember {
 		this.timeZone 		= model.timeZone;
 		this.regionCode 	= model.regionCode;
 		this.languageCode 	= model.languageCode;
-	}
+	};
 	
 	static findAll (next) {
-		next(null, db);
-	}
+		connection.query(
+			"SELECT * FROM chatRoomMembers",
+			(error, data) => {
+				if (error)
+					res(error, null);
+				else
+					res(null, data);
+			}
+		);
+	};
+	
+	static findById (id, next) {
+		connection.query(
+			"SELECT * FROM chatRoomMembers WHERE ? = ?",
+			['id', id],
+			(error, data) => {
+				if (error)
+					res(error, null);
+				else
+					res(null, data);
+			}
+		);
+	};
 	
 	static findByUserId (userId, next) {
-		next(null, db.filter(member => member.userId === userId));
-	}
+		connection.query(
+			"SELECT * FROM chatRoomMembers WHERE ? = ?",
+			['userId', userId],
+			(error, data) => {
+				if (error)
+					res(error, null);
+				else
+					res(null, data);
+			}
+		);
+	};
 	
-	static create (model, next) {
-		db.push(model);
-		next(null, db);
-	}
+	static findByRoomId (roomId, next) {
+		connection.query(
+			"SELECT * FROM chatRoomMembers WHERE ? = ?",
+			['roomId', roomId],
+			(error, data) => {
+				if (error)
+					res(error, null);
+				else
+					res(null, data);
+			}
+		);
+	};
+	
+	static create (newMember, next) {
+		connection.query(
+			"INSERT INTO chatRoomMembers SET ?",
+			newMember,
+			(error, data) => {
+				if (error)
+					res(error, null);
+				else
+					res(null, data);
+			}
+		);
+	};
+	
+	static delete (roomId, userId, next) {
+		connection.query(
+			"DELETE * FROM chatRoomMembers WHERE ? = ? AND ? = ?",
+			['roomId', roomId, 'userId', userId],
+			(error, data) => {
+				if (error) {
+					res(error, null);
+				} else {
+					res(null, data);
+				}
+			}
+		);
+	};
+	
+	static makeAdmin (roomId, userId, next) {
+		connection.query(
+			"UPDATE chatRoomMembers SET isAdmin = 1 WHERE ? = ? AND ? = ?",
+			['roomId', roomId, 'userId', userId],
+			(error, data) => {
+				if (error)
+					res(error, null);
+				else
+					res(null, data);
+			}
+		);
+	};
+	
+	static removeAdmin (roomId, userId, next) {
+		connection.query(
+			"UPDATE chatRoomMembers SET isAdmin = 0 WHERE ? = ? AND ? = ?",
+			['roomId', roomId, 'userId', userId],
+			(error, data) => {
+				if (error)
+					res(error, null);
+				else
+					res(null, data);
+			}
+		);
+	};
 };
 
 var db = [
@@ -67,6 +158,7 @@ CREATE TABLE chatRoomMembers(
 	timeZone VARCHAR(32),
 	regionCode VARCHAR(32),
 	languageCode VARCHAR(32),
+	createTime DATETIME DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (id),
 	FOREIGN KEY (roomId) REFERENCES chatRooms(id),
 	FOREIGN KEY (userId) REFERENCES users(id),

@@ -11,67 +11,95 @@ class Follower {
 		this.createTime = model.createTime;
 	}
 	
-	static create = (userId, followerId, res) => {
+	static create = (userId, followerId, next) => {
 		connection.query(
 			"INSERT INTO followers SET ?",
 			{ "userId": userId, "followerId": followerId },
 			(error, data) => {
 				if (error)
-					res(error, null);
+					next(error, null);
 				else
-					res(null, data);
+					next(null, data);
 			}
 		)
 	}
 	
-	static delete = (userId, followerId, res) => {
+	static delete = (userId, followerId, next) => {
 		connection.query(
-			"DELETE FROM followers WHERE userId = ? AND followerId = ?",
-			[userId, followerId],
+			"DELETE FROM followers WHERE ? = ? AND ? = ?",
+			['userId', userId, 'followerId', followerId],
 			(error, data) => {
 				if (error)
-					res(error, null);
+					next(error, null);
 				else
-					res(null, data);
+					next(null, data);
 			}
 		)
 	}
 	
-	static findByUserId = (userId, res) => {
+	static findByUserId = (userId, next) => {
+		var query = "SELECT \n" +
+			"a.id, " +
+			"a.username, " +
+			"a.firstName, " +
+			"a.lastName, " +
+			"a.email, " +
+			"a.imageUrl \n" +
+			"FROM \n" +
+			"users a, " +
+			"followers b \n" +
+			"WHERE \n" +
+			"a.id = b.userId \n" +
+			"AND ? = ?";
+			
 		connection.query(
-			"SELECT * FROM followers WHERE userId = ? ORDER BY followerId",
-			userId,
+			query,
+			['b.userId', userId],
 			(error, data) => {
 				if (error)
-					res(error, null);
+					next(error, null);
 				else
-					res(null, data);
+					next(null, data);
 			}	
 		)
 	}
 	
-	static findByFollowerId = (followerId, res) => {
+	static findByFollowerId = (followerId, next) => {
+		var query = "SELECT \n" +
+			"a.id, " +
+			"a.username, " +
+			"a.firstName, " +
+			"a.lastName, " +
+			"a.email, " +
+			"a.imageUrl \n" +
+			"FROM \n" +
+			"users a, " +
+			"followers b \n" +
+			"WHERE \n" +
+			"a.id = b.followerId \n" +
+			"AND ? = ?";
+		
 		connection.query(
-			"SELECT * FROM followers WHERE followerId = ? ORDER BY userId",
-			followerId,
+			query,
+			['b.followerId', followerId],
 			(error, data) => {
 				if (error)
-					res(error, null);
+					next(error, null);
 				else
-					res(null, data);
+					next(null, data);
 			}
 		)
 	}
 	
-	static findByUserIdAndFollowerId = (userId, followerId, res) => {
+	static findByUserIdAndFollowerId = (userId, followerId, next) => {
 		connection.query(
-			"SELECT * FROM followers WHERE userId = ? AND followerId = ? ORDER BY createTime",
-			[userId, followerId],
+			"SELECT * FROM followers WHERE ? = ? AND ? = ? ORDER BY createTime",
+			['userId', userId, 'followerId', followerId],
 			(error, data) => {
 				if (error)
-					res(error, null);
+					next(error, null);
 				else
-					res(null, data);
+					next(null, data);
 			}
 		)
 	}
@@ -97,7 +125,7 @@ CREATE TABLE followers(
 	id INT NOT NULL AUTO_INCREMENT,
 	userId INT NOT NULL,
 	followerId INT NOT NULL,
-	createTime DATETIME,
+	createTime DATETIME DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (id),
 	FOREIGN KEY (userId) REFERENCES users(id),
 	FOREIGN KEY (followerId) REFERENCES users(id)

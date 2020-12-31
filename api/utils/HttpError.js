@@ -24,7 +24,7 @@ class HttpError {
 	static send(statusCode, message, res) {
 		res.status(statusCode).send({
 			"error": {
-				"code": statusCode,
+				"statusCode": statusCode,
 				"message": message,
 				"status": HttpError.getStatus(statusCode)
 			}
@@ -32,6 +32,7 @@ class HttpError {
 	}
 	
 	static sendError(error, res) {
+		console.log(error);
 		HttpError.send(500, HttpError.getDatabaseErrorStatus(error.errno), res);
 	}
 	

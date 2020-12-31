@@ -18,15 +18,17 @@ var User = function(model) {
 	this.createTime 	= model.createTime;
 	this.updateTime 	= model.updateTime;
 	this.deleteTime 	= model.deleteTime;
+	this.tokenExpireTime = model.tokenExpireTime;
 	this.timeZone 		= model.timeZone;
 	this.regionCode 	= model.regionCode;
 	this.languageCode 	= model.languageCode;
 	this.imageUrl		= model.imageUrl;
+	this.isActive		= model.isActive;
 };
 
 User.findAll = (res) => {
 	connection.query(
-		"SELECT * FROM users ORDER BY id",
+		"SELECT id, username, firstName, lastName, email, description, phoneNumber, birthDate, imageUrl FROM users ORDER BY id",
 		(error, data) => {
 			if (error)
 				res(error, null);
@@ -37,8 +39,8 @@ User.findAll = (res) => {
 
 User.findById = (id, res) => {
 	connection.query(
-		"SELECT * FROM users WHERE id = ? ORDER BY id",
-		id,
+		"SELECT * FROM users WHERE ? = ? ORDER BY id",
+		['id', id],
 		(error, data) => {
 			if (error) {
 				res(error, null);
@@ -51,8 +53,8 @@ User.findById = (id, res) => {
 
 User.findByToken = (token, res) => {
 	connection.query(
-		"SELECT * FROM users WHERE token = ?",
-		token,
+		"SELECT * FROM users WHERE ? = ?",
+		['token', token],
 		(error, data) => {
 			if (error)
 				res(error, null);
@@ -64,8 +66,8 @@ User.findByToken = (token, res) => {
 
 User.findByUsername = (username, res) => {
 	connection.query(
-		"SELECT * FROM users WHERE username = ? ORDER BY username",
-		username,
+		"SELECT id, username, firstName, lastName, email, description, phoneNumber, birthDate, imageUrl FROM users WHERE LOWER(?) = LOWER(?) ORDER BY username",
+		['username',username],
 		(error, data) => {
 			if (error) {
 				res(error, null);
@@ -76,10 +78,38 @@ User.findByUsername = (username, res) => {
 	);
 };
 
-User.findByUsernameOrEmail = (input, res) => {
+User.findByEmail = (email, res) => {
 	connection.query(
-		"SELECT * FROM users WHERE username = ? OR email = ? LIMIT 1",
-		[input, input],
+		"SELECT * FROM users WHERE LOWER(?) = LOWER(?) LIMIT 1",
+		['email', email],
+		(error, data) => {
+			if (error) {
+				res(error, null);
+			} else {
+				res(null, data);
+			}
+		}
+	);
+};
+
+User.findByUsernameOrEmail = (username, email, res) => {
+	connection.query(
+		"SELECT * FROM users WHERE LOWER(?) = LOWER(?) OR LOWER(?) = LOWER(?)",
+		['username', username, 'email', email],
+		(error, data) => {
+			if (error) {
+				res(error, null);
+			} else {
+				res(null, data);
+			}
+		}
+	);
+}
+
+User.findByUsernameOrEmail = (usernameOrEmail, res) => {
+	connection.query(
+		"SELECT * FROM users WHERE ? = ? OR ? = ? LIMIT 1",
+		['username', usernameOrEmail, 'email', usernameOrEmail],
 		(error, data) => {
 			if (error) {
 				res(error, null);
@@ -118,8 +148,8 @@ User.deleteAll = (res) => {
 
 User.deleteById = (id, res) => {
 	connection.query(
-		"DELETE FROM users WHERE id = ?",
-		id,
+		"DELETE FROM users WHERE ? = ?",
+		['id', id],
 		(error, data) => {
 			if (error)
 				res(error, null);
@@ -133,8 +163,8 @@ User.deleteById = (id, res) => {
 
 User.updateLastLogin = (id, res, lastLoginTime = new Date()) => {
 	connection.query(
-		"UPDATE users SET lastLoginTime = ? WHERE id = ?",
-		[lastLoginTime, id],
+		"UPDATE users SET ? = ? WHERE ? = ?",
+		['lastLoginTime', lastLoginTime, 'id', id],
 		(error, data) => {
 			if (error)
 				res(error, null);
@@ -153,8 +183,44 @@ User.updateLastLogin = (id, res, lastLoginTime = new Date()) => {
  */
 User.updatePasswordForUserWithId = (id, newPassword, res) => {
 	connection.query(
-		"UPDATE users SET password = ? WHERE id = ?",
-		[newPassword, id],
+		"UPDATE users SET ? = ?, updateTime = CURRENT_TIMESTAMP WHERE ? = ?",
+		['password', newPassword, 'id', id],
+		(error, data) => {
+			if (error)
+				res(error, null);
+			else
+				res(null, data);
+		});
+}
+
+/**
+ * Updates the email for a given user with id.
+ * @param {int} id
+ * @param {string} email
+ * @api public
+ */
+User.updateEmailForUserWithId = (id, newEmail, res) => {
+	connection.query(
+		"UPDATE users SET ? = ?, updateTime = CURRENT_TIMESTAMP WHERE ? = ?",
+		['email', newEmail, 'id', id],
+		(error, data) => {
+			if (error)
+				res(error, null);
+			else
+				res(null, data);
+		});
+}
+
+/**
+ * Updates the description for a given user with id.
+ * @param {int} id
+ * @param {string} description
+ * @api public
+ */
+User.updateDescriptionForUserWithId = (id, newDescription, res) => {
+	connection.query(
+		"UPDATE users SET ? = ?, updateTime = CURRENT_TIMESTAMP WHERE ? = ?",
+		['description', newDescription, 'id', id],
 		(error, data) => {
 			if (error)
 				res(error, null);
@@ -238,13 +304,15 @@ CREATE TABLE users(
 	phoneNumber VARCHAR(32),
 	birthDate DATE,
 	lastLoginTime DATETIME,
-	createTime DATETIME,
+	createTime DATETIME DEFAULT CURRENT_TIMESTAMP,
 	deleteTime DATETIME,
 	updateTime DATETIME,
+	tokenExpireTime DATETIME,
 	timeZone VARCHAR(32),
 	regionCode VARCHAR(32),
 	languageCode VARCHAR(32),
 	imageUrl VARCHAR(256),
+	isActive TINYINT(1) DEFAULT 1,
 	PRIMARY KEY (id),
 	UNIQUE (id),
 	UNIQUE (username),

@@ -4,6 +4,7 @@ var User = require('../models/User.js');
 var Follower = require('../models/Follower');
 var HttpError = require('../utils/HttpError.js');
 var HttpResponse = require('../utils/HttpResponse');
+var validator = require('validator');
 
 exports.findAll = (req, res) => {
 	User.findAll( (error, data) => {
@@ -29,6 +30,22 @@ exports.findByUsername = (req, res) => {
 			HttpError.send(500, error.sqlMessage, res);
 		else
 			HttpRespnose.send(data, res);
+	});
+};
+
+exports.isUsernameAvailable = (req, res) => {
+	var username = req.params.username;
+	console.log(username);
+	if (typeof username === 'undefined' || !User.validUsername(username)) {
+		HttpError.send(400, 'Valid username required.', res);
+		return;
+	}
+	
+	User.findByUsername(username, (error, data) => {
+		if (error)
+			HttpError.send(500, error.sqlMessage, res);
+		else
+			HttpResponse.send({ "available": data.length === 0 }, res);
 	});
 };
 
@@ -67,6 +84,8 @@ exports.login = (req, res) => {
 		return;
 	}
 	
+	console.log(req.body);
+	
 	let username = req.body.username;
 	let password = req.body.password;
 	
@@ -76,7 +95,7 @@ exports.login = (req, res) => {
 	}
 
 	// User input should either be a valid email or valid username
-	if (!User.validUsername(username) && !User.validEmail(username)) {
+	if (!User.validUsername(username) && !validator.isEmail(username)) {
 		HttpError.send(400, 'Invalid credentials entered.', res);
 		return;
 	}
@@ -134,7 +153,7 @@ exports.create = (req, res) => {
 		return;
 	}
 
-	if (!User.validEmail(newUser.email)) {
+	if (!validator.isEmail(newUser.email)) {
 		HttpError.send(400, 'Valid email is required.', res);
 		return;
 	}
@@ -158,14 +177,37 @@ exports.create = (req, res) => {
 
 	// Hash Password
 	newUser.password = User.encrypted(newUser.password);
-
-	User.create(newUser, (error, data) => {
+	
+	User.findByUsername(newUser.username, (error, usersByUsername) => {
 		if (error) {
 			HttpError.sendError(error, res);
 			return;
 		}
-		console.log(`New user created: ${JSON.stringify(newUser)}`);
-		HttpResponse.send(data, res);
+		
+		if (usersByUsername.length > 0) {
+			HttpError.send(400, 'Username is already taken, please try another.', res);
+			return;
+		}
+		
+		User.findByEmail(newUser.email, (err, usersByEmail) => {
+			if (err) {
+				HttpError.sendError(err, res);
+				return;
+			}
+			if (usersByEmail.length > 0) {
+				HttpError.send(400, 'Email is already being used by another account. Please use a different email.', res);
+				return;
+			}
+			
+			User.create(newUser, (er, data) => {
+				if (er) {
+					HttpError.sendError(er, res);
+					return;
+				}
+				console.log(`New user created: ${JSON.stringify(newUser)}`);
+				HttpResponse.send(data, res);
+			});
+		});
 	});
 };
 
@@ -307,10 +349,12 @@ exports.findFollowersByFollowerId = (req, res) => {
 	var followerId = parseInt(req.params.followerId);
 	
 	Follower.findByFollowerId(followerId, (error, data) => {
-		if (error)
+		if (error) {
 			HttpError.sendError(error, res);
-		else
-			HttpResponse.send(data, res);
+			return;
+		}
+		
+		HttpResponse.send(data, res);
 	});
 };
 

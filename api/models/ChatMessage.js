@@ -13,44 +13,146 @@ class ChatMessage {
 		this.roomId			= model.roomId;
 		this.body 			= model.body;
 		this.parentId 		= model.parentId;
-		this.creatorId 		= model.creatorId;
-		this.createTime 	= model.createTime;
+		this.senderId 		= model.senderId;
+		this.sendTime 		= model.sendTime;
 		this.updateTime 	= model.updateTime;
 		this.deleteTime 	= model.deleteTime;
 		this.timeZone 		= model.timeZone;
 		this.regionCode 	= model.regionCode;
 		this.languageCode 	= model.languageCode;
-	}
+	};
 	
 	/**
 	 * @api public
 	 */
 	 
-	static create = (message, next) => {
+	static create = (newMessage, next) => {
+		connection.query(
+			"INSERT INTO chatMessages SET ?",
+			newMessage,
+			(error, data) => {
+				if (error)
+					next(error, null);
+				else
+					next(null, data);
+			}
+		);
+	};
+	
+	static delete = (id, next) => {
 		
-	}
+		if (isNaN(id)) {
+			next(new Error("Invalid parameter type for parameter `id`"), null);
+			return;
+		}
+		
+		connection.query(
+			"DELETE FROM chatMessages WHERE ? = ?",
+			['id', id],
+			(error, data) => {
+				if (error)
+					next(error, null);
+				else
+					next(null, data);
+			});
+	};
 	
 	static findById = (id, next) => {
-		next(null, db.find(message => message.id === id));
+		
+		if (isNaN(id)) {
+			next(new Error("Invalid parameter type for parameter `id`"), null);
+			return;
+		}
+		
+		connection.query(
+			"SELECT * FROM chatMessages WHERE ? = ?",
+			['id', id],
+			(error, data) => {
+				if (error)
+					next(error, null);
+				else
+					next(null, data);
+			});
 	};
 	
 	static findByRoomId = (roomId, next) => {
-		next(null, db.filter(x => x.roomId === roomId));
-	}
+		
+		if (isNaN(roomId)) {
+			next(new Error("Invalid parameter type for parameter `roomId`."), null);
+			return;
+		}
+		
+		connection.query(
+			"SELECT * FROM chatMessages WHERE ? = ?",
+			['roomId', roomId],
+			(error, data) => {
+				if (error)
+					next(error, null);
+				else
+					next(null, data);
+			});
+	};
 	
-	static findByCreatorId = (creatorId, next) => {
-		next(null, db.filter(x => x.creatorId === creatorId));
-	}
+	static findBySenderId = (senderId, next) => {
+		
+		if (isNaN(senderId)) {
+			next(new Error("Invalid parameter type for parameter `senderId`."), null);
+			return;
+		}
+		
+		connection.query(
+			"SELECT * FROM chatMessages WEHRE ? = ?",
+			['roomId', roomId],
+			(error, data) => {
+				if (error)
+					next(error, null);
+				else
+					next(null, data);
+			});
+	};
 	
 	static findByParentId = (parentId, next) => {
-		next(null, db.filter(x => x.parentId === parentId));
-	}
+		
+		if (isNaN(parentId)) {
+			next(new Error("Invalid parameter type for parameter `parentId`"), null);
+			return;
+		}
+		
+		connection.query(
+			"SELECT * FROM chatMessages WHERE ? = ?",
+			['parentId', parentId],
+			(error, data) => {
+				if (error)
+					next(error, null);
+				else
+					next(null, data);
+			}
+		);
+	};
 	
 	static updateMessageBody = (id, newBody, next) => {
-		var directMessage = db.find(message => message.id === id);
-		directMessage.body = newBody
-		next(null, directMessage);
-	}
+		
+		if (isNaN(id)) {
+			next(new Error("Invalid parameter type for parameter `id`"), null);
+			return;
+		}
+		
+		if (typeof newBody !== 'string') {
+			next(new Error("Invalid parameter type for parameter `newBody`."), null);
+			return;
+		}
+		
+		connection.query(
+			"UPDATE chatMessages SET ? = ? AND updateTime = CURRENT_TIMESTAMP WHERE ? = ?",
+			['body', newBody, 'id', id],
+			(error, data) => {
+				if (error)
+					next(error, null);
+				else
+					next(null, data);
+			}
+		);
+	};
 };
 
 var db = [
@@ -59,8 +161,8 @@ var db = [
 		"roomId": 1,
 		"body": "Test message.",
 		"parentId": 0,
-		"creatorId": 14,
-		"createTime": Date(),
+		"senderId": 14,
+		"sendTime": Date(),
 		"updateTime": Date(),
 		"timeZone": "",
     	"regionCode": "419",
@@ -71,8 +173,8 @@ var db = [
 		"roomId": 1,
 		"body": "Test reply.",
 		"parentId": 1,
-		"creatorId": 15,
-		"createTime": Date(),
+		"senderId": 15,
+		"sendTime": Date(),
 		"updateTime": Date(),
 		"timeZone": "",
     	"regionCode": "419",
@@ -83,8 +185,8 @@ var db = [
 		"roomId": 1,
 		"body": "Test reply #2.",
 		"parentId": 2,
-		"creatorId": 14,
-		"createTime": Date(),
+		"senderId": 14,
+		"sendTime": Date(),
 		"updateTime": Date(),
 		"timeZone": "",
     	"regionCode": "419",
@@ -101,17 +203,17 @@ module.exports = ChatMessage;
 CREATE TABLE chatMessages(
 	id INT NOT NULL AUTO_INCREMENT,
 	roomId INT NOT NULL,
-	userId INT NOT NULL,
+	senderId INT NOT NULL,
 	body VARCHAR(512),
 	parentId INT,
-	createTime DATETIME,
+	sendTime DATETIME DEFAULT CURRENT_TIMESTAMP,
 	updateTime DATETIME,
 	timeZone VARCHAR(32),
 	regionCode VARCHAR(32),
 	languageCode VARCHAR(32),
 	PRIMARY KEY (id),
 	FOREIGN KEY (roomId) REFERENCES chatRooms(id),
-	FOREIGN KEY (userId) REFERENCES users(id),
+	FOREIGN KEY (senderId) REFERENCES users(id),
 	UNIQUE (id)
 );
 
